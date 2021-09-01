@@ -30,7 +30,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: hand_tracking_cpu
-        path: mediapipe/bazel-bin/mediapipe/examples/desktop/hand_tracking/hand_tracking_cpu
+        path: mediapipe/bazel-bin/mediapipe/examples/desktop/hand_tracking/hand_tracking_cpu.exe
 
     - name: Setup tmate session
       if: ${{ failure() }}
