@@ -1,4 +1,4 @@
-name: Build Hands
+name: Build Custom Hands
 
 on: [ workflow_dispatch ]
 
