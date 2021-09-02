@@ -142,7 +142,7 @@ node {
       connection_color { r: 255 g: 255 b: 255 }
       thickness: 0.0
       visualize_landmark_depth: false
-      utilize_visibility: true
+      utilize_visibility: false
       visibility_threshold: 0.5
     }
   }
@@ -206,7 +206,7 @@ node {
       connection_color { r: 255 g: 255 b: 255 }
       thickness: 0.0
       visualize_landmark_depth: false
-      utilize_visibility: true
+      utilize_visibility: false
       visibility_threshold: 0.5
     }
   }
@@ -224,7 +224,7 @@ node {
       connection_color { r: 255 g: 138 b: 0 }
       thickness: 0.0
       visualize_landmark_depth: false
-      utilize_visibility: true
+      utilize_visibility: false
       visibility_threshold: 0.5
     }
   }
@@ -242,7 +242,7 @@ node {
       connection_color { r: 0 g: 217 b: 231 }
       thickness: 0.0
       visualize_landmark_depth: false
-      utilize_visibility: true
+      utilize_visibility: false
       visibility_threshold: 0.5
     }
   }
