@@ -23,15 +23,15 @@ jobs:
         pip install numpy
         Invoke-WebRequest https://github.com/opencv/opencv/releases/download/3.4.10/opencv-3.4.10-vc14_vc15.exe -OutFile opencv.exe
         .\opencv.exe -o"C:" -y
-        bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe-custom/hand_tracking:hand_tracking_cpu --distdir=mediapipe/bazel-bin
+        cd mediapipe-custom && bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 hand_tracking:hand_tracking_cpu --distdir=bazel-bin
     
     - name: The job has succeeded
       if: ${{ success() }}
       uses: actions/upload-artifact@v2
       with:
         name: hand_tracking_cpu
-        path: mediapipe/bazel-bin/hand_tracking_cpu.exe
-
+        path: mediapipe-custom/bazel-bin
+        
     - name: Setup tmate session
       if: ${{ failure() }}
       uses: mxschmitt/action-tmate@v3
