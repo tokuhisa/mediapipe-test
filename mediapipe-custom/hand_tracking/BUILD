@@ -40,3 +40,20 @@ cc_binary(
         "//mediapipe/graphs/hand_tracking:mobile_calculators",
     ],
 )
+
+cc_binary(
+    name = "hand_tracking_cpu_lib",
+    srcs = ["hand_tracking_cpu_lib.cc",
+            "hand_tracking_cpu_lib.h"],
+    deps = [
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/formats:image_frame",
+        "//mediapipe/framework/port:file_helpers",
+        "//mediapipe/framework/port:parse_text_proto",
+        "//mediapipe/framework/port:status",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/flags:parse",
+        "//mediapipe/graphs/hand_tracking:desktop_tflite_calculators",
+    ],
+    linkshared = 1,
+)
