@@ -23,7 +23,7 @@ jobs:
         pip install numpy
         Invoke-WebRequest https://github.com/opencv/opencv/releases/download/3.4.10/opencv-3.4.10-vc14_vc15.exe -OutFile opencv.exe
         .\opencv.exe -o"C:" -y
-        cd mediapipe && bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe-custom/hand_tracking:hand_tracking_cpu --distdir=mediapipe/bazel-bin
+        bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe-custom/hand_tracking:hand_tracking_cpu --distdir=mediapipe/bazel-bin
     
     - name: The job has succeeded
       if: ${{ success() }}
