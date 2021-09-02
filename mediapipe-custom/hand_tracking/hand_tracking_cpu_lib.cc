@@ -1,4 +1,4 @@
-#include "cppLibrary.h"
+#include "hand_tracking_cpu_lib.h"
 
 float count = 0;
 CPPLIBRARY_API float count_up(void)
