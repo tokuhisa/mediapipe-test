@@ -43,6 +43,7 @@ cc_library(
     deps = [
         "//mediapipe/calculators/core:constant_side_packet_calculator",
         "//mediapipe/calculators/core:flow_limiter_calculator",
+        "//mediapipe-custom/pose_tracking/graphs/subgraphs:pose_renderer_cpu",
         "//mediapipe/modules/pose_landmark:pose_landmark_cpu",
     ],
 )
