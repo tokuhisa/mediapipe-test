@@ -120,7 +120,7 @@ absl::Status RunMPPGraph() {
 
     // Get the graph result packet, or stop if that fails.
     mediapipe::Packet packet;
-    if (!poller.Next(&packet)) break;
+    // if (!poller.Next(&packet)) break;
     // auto& output_frame = packet.Get<mediapipe::ImageFrame>();
 
     // Convert back to opencv for display or saving.
