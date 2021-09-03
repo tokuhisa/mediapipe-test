@@ -27,8 +27,9 @@
 #include "mediapipe/framework/port/parse_text_proto.h"
 #include "mediapipe/framework/port/status.h"
 
-constexpr char kInputStream[] = "input_video";
-constexpr char kOutputStream[] = "output_video";
+// constexpr char kInputStream[] = "input_video";
+constexpr char kInputStream[] = "image";
+// constexpr char kOutputStream[] = "output_video";
 constexpr char kWindowName[] = "MediaPipe";
 
 ABSL_FLAG(std::string, calculator_graph_config_file, "",

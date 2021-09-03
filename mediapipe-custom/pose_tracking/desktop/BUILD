@@ -20,7 +20,7 @@ cc_binary(
     name = "pose_tracking_cpu",
     deps = [
         "//mediapipe-custom/pose_tracking/desktop:demo_run_graph_main",
-        "//mediapipe-custom/pose_tracking/graphs:pose_tracking_cpu_deps",
+        "//mediapipe/modules/pose_landmark:pose_landmark_cpu",
     ],
 )
 
