@@ -27,9 +27,8 @@
 #include "mediapipe/framework/port/parse_text_proto.h"
 #include "mediapipe/framework/port/status.h"
 
-// constexpr char kInputStream[] = "input_video";
 constexpr char kInputStream[] = "image";
-// constexpr char kOutputStream[] = "output_video";
+constexpr char kOutputStream[] = "segmentation_mask";
 constexpr char kWindowName[] = "MediaPipe";
 
 ABSL_FLAG(std::string, calculator_graph_config_file, "",
@@ -78,8 +77,8 @@ absl::Status RunMPPGraph() {
   }
 
   LOG(INFO) << "Start running the calculator graph.";
-  // ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller,
-  //                  graph.AddOutputStreamPoller(kOutputStream));
+  ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller,
+                   graph.AddOutputStreamPoller(kOutputStream));
   MP_RETURN_IF_ERROR(graph.StartRun({}));
 
   LOG(INFO) << "Start grabbing and processing frames.";
@@ -109,9 +108,6 @@ absl::Status RunMPPGraph() {
     cv::Mat input_frame_mat = mediapipe::formats::MatView(input_frame.get());
     camera_frame.copyTo(input_frame_mat);
 
-    cv::Mat output_frame_mat = mediapipe::formats::MatView(input_frame.get());
-    cv::cvtColor(output_frame_mat, output_frame_mat, cv::COLOR_RGB2BGR);
-
     // Send image packet into the graph.
     size_t frame_timestamp_us =
         (double)cv::getTickCount() / (double)cv::getTickFrequency() * 1e6;
@@ -121,12 +117,13 @@ absl::Status RunMPPGraph() {
 
     // Get the graph result packet, or stop if that fails.
     mediapipe::Packet packet;
-    // if (!poller.Next(&packet)) break;
-    // auto& output_frame = packet.Get<mediapipe::ImageFrame>();
+    if (!poller.Next(&packet)) break;
+    auto& output_frame = packet.Get<mediapipe::ImageFrame>();
 
     // Convert back to opencv for display or saving.
-    // cv::Mat output_frame_mat = mediapipe::formats::MatView(&output_frame);
+    cv::Mat output_frame_mat = mediapipe::formats::MatView(&output_frame);
     // cv::cvtColor(output_frame_mat, output_frame_mat, cv::COLOR_RGB2BGR);
+    
     if (save_video) {
       if (!writer.isOpened()) {
         LOG(INFO) << "Prepare video writer.";
