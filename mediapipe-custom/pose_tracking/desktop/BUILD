@@ -19,7 +19,7 @@ package(default_visibility = ["//mediapipe/examples:__subpackages__"])
 cc_binary(
     name = "pose_tracking_cpu",
     deps = [
-        "//mediapipe/examples/desktop:demo_run_graph_main",
+        "//mediapipe-custom/pose_tracking/desktop:demo_run_graph_main",
         "//mediapipe-custom/pose_tracking/graphs:pose_tracking_cpu_deps",
     ],
 )
@@ -30,5 +30,23 @@ cc_binary(
     deps = [
         "//mediapipe/examples/desktop:demo_run_graph_main_gpu",
         "//mediapipe/graphs/pose_tracking:pose_tracking_gpu_deps",
+    ],
+)
+
+cc_library(
+    name = "demo_run_graph_main",
+    srcs = ["demo_run_graph_main.cc"],
+    deps = [
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/formats:image_frame",
+        "//mediapipe/framework/formats:image_frame_opencv",
+        "//mediapipe/framework/port:file_helpers",
+        "//mediapipe/framework/port:opencv_highgui",
+        "//mediapipe/framework/port:opencv_imgproc",
+        "//mediapipe/framework/port:opencv_video",
+        "//mediapipe/framework/port:parse_text_proto",
+        "//mediapipe/framework/port:status",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/flags:parse",
     ],
 )
