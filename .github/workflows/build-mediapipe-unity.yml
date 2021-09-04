@@ -1,0 +1,41 @@
+name: Build MediaPipeUnityPlugin
+
+on: [ workflow_dispatch ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Initialize
+      uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Cache Bazel
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/bazel
+        key: ${{ runner.os }}-${{ hashFiles('WORKSPACE') }}
+
+    - name: Build binary
+      run: |
+        pip install numpy
+        Invoke-WebRequest https://github.com/opencv/opencv/releases/download/3.4.10/opencv-3.4.10-vc14_vc15.exe -OutFile opencv.exe
+        .\opencv.exe -o"C:" -y
+        Invoke-WebRequest https://github.com/homuler/MediaPipeUnityPlugin/archive/refs/tags/v0.6.2.zip -OutFile MediaPipeUnityPlugin.zip
+        Expand-Archive MediaPipeUnityPlugin.zip MediaPipeUnityPlugin
+        cd MediaPipeUnityPlugin\MediaPipeUnityPlugin-0.6.2 && docker build -t mediapipe_unity:windows . -f docker/windows/x86_64/Dockerfile && docker run --cpus=16 --memory=8192m --mount type=bind,src=%CD%\Packages,dst=C:\mediapipe\Packages -it mediapipe_unity:windows
+        cd mediapipe && bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe/examples/desktop/pose_tracking:pose_tracking_cpu
+    
+    - name: The job has succeeded
+      if: ${{ success() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: pose_tracking_cpu
+        path: C:\mediapipe\Packages
+
+    - name: Setup tmate session
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3
+      timeout-minutes: 30
