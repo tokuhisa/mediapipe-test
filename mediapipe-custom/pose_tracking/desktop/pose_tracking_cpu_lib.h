@@ -3,6 +3,7 @@
 #define CPPLIBRARY_API __declspec(dllexport) 
 
 #include <cstdlib>
+#include "mediapipe/framework/deps/safe_int.h"
 
 extern "C"
 {

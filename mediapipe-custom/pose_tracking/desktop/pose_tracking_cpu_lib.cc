@@ -1,7 +1,5 @@
 #include "pose_tracking_cpu_lib.h"
 
-#include <cstdlib>
-
 #include "mediapipe/framework/calculator_framework.h"
 #include "mediapipe/framework/formats/image_frame.h"
 #include "mediapipe/framework/port/parse_text_proto.h"
@@ -316,18 +314,22 @@ CalculatorGraph graph;
 
 float* segmentation_mask = nullptr;
 
-CPPLIBRARY_API void init_pose_tracking(void)
-{
+absl::Status InitPoseTracking() {
 	LOG(INFO) << "Initialize the calculator graph.";
 	MP_RETURN_IF_ERROR(graph.Initialize(config));
 	
 	LOG(INFO) << "Start running the calculator graph.";
 	ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller, graph.AddOutputStreamPoller(kOutputStreamSegmentationMask));
 	MP_RETURN_IF_ERROR(graph.StartRun({}));
+	return absl::OkStatus();
 }
 
-CPPLIBRARY_API void process_pose_tracking(int width, int height, uint8* input_pixel_data, float* output_segmentation_mask, int64 frame_timestamp_us)
+CPPLIBRARY_API void init_pose_tracking(void)
 {
+	InitPoseTracking();
+}
+
+absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data, float* output_segmentation_mask, int64 frame_timestamp_us) {
 	int number_Of_channels = 3; // SRGB format
 	int byte_depth = 1; // SRGB format
 	int width_step = width * number_Of_channels * 1;
@@ -344,4 +346,11 @@ CPPLIBRARY_API void process_pose_tracking(int width, int height, uint8* input_pi
 
 	int segmentation_mask_size = width * height; // VEC32F1
 	output_frame.CopyToBuffer(dst_segmentation_mask, segmentation_mask_size);
+
+	return absl::OkStatus();
+}
+
+CPPLIBRARY_API void process_pose_tracking(int width, int height, uint8* input_pixel_data, float* output_segmentation_mask, int64 frame_timestamp_us)
+{
+	ProcessPoseTracking(width, height, input_pixel_data, output_segmentation_mask, frame_timestamp_us);
 }
