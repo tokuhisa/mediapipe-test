@@ -311,7 +311,7 @@ node: {
       )pb");
 
 mediapipe::CalculatorGraph graph;
-mediapipe::OutputStreamPoller poller;
+std::unique_ptr<mediapipe::OutputStreamPoller> poller;
 
 float* segmentation_mask = nullptr;
 
@@ -320,8 +320,12 @@ absl::Status InitPoseTracking() {
 	MP_RETURN_IF_ERROR(graph.Initialize(config));
 	
 	LOG(INFO) << "Start running the calculator graph.";
-	ASSIGN_OR_RETURN(poller, graph.AddOutputStreamPoller(kOutputStreamSegmentationMask));
+
+	auto status_or_poller = graph.AddOutputStreamPoller(kOutputStreamSegmentationMask);
+	poller = std::make_unique<mediapipe::OutputStreamPoller>(std::move(status_or_poller.ValueOrDie()));
+
 	MP_RETURN_IF_ERROR(graph.StartRun({}));
+	
 	return absl::OkStatus();
 }
 
@@ -341,7 +345,7 @@ absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data,
 
     // Get the graph result packet.
     mediapipe::Packet packet;
-    if (!poller.Next(&packet)) return;
+    if (!poller.get().Next(&packet)) return;
 
     auto& output_frame = packet.Get<mediapipe::ImageFrame>();
 
