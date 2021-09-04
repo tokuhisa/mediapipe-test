@@ -345,7 +345,7 @@ absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data,
 
     // Get the graph result packet.
     mediapipe::Packet packet;
-    if (!poller.get().Next(&packet)) {
+    if (!poller.get()->Next(&packet)) {
 		return absl::UnavailableError("Could not get segmentation_mask.");
 	}
 
