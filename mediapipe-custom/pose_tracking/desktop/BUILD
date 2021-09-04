@@ -65,11 +65,11 @@ cc_binary(
             "pose_tracking_cpu_lib.h"],
     deps = [
         "//mediapipe/framework:calculator_framework",
-    #     "//mediapipe/framework/formats:image_frame",
-    #     "//mediapipe/framework/port:parse_text_proto",
-    #     "//mediapipe/framework/port:status",
+        "//mediapipe/framework/formats:image_frame",
+        "//mediapipe/framework/port:parse_text_proto",
+        "//mediapipe/framework/port:status",
     #     "//mediapipe/modules/pose_landmark:pose_landmark_cpu",
-    #     "//mediapipe/calculators/core:flow_limiter_calculator",
+        "//mediapipe/calculators/core:flow_limiter_calculator",
     ],
     linkshared = 1,
 )
