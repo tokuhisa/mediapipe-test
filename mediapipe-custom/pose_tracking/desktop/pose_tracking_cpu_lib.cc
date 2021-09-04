@@ -1,5 +1,7 @@
 #include "pose_tracking_cpu_lib.h"
 
+#include <memory>
+
 #include "mediapipe/framework/calculator_framework.h"
 #include "mediapipe/framework/formats/image_frame.h"
 #include "mediapipe/framework/port/parse_text_proto.h"
@@ -345,7 +347,9 @@ absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data,
 
     // Get the graph result packet.
     mediapipe::Packet packet;
-    if (!poller.get().Next(&packet)) return;
+    if (!poller.get().Next(&packet)) {
+		return absl::availableError("Could not get segmentation_mask.");
+	}
 
     auto& output_frame = packet.Get<mediapipe::ImageFrame>();
 
