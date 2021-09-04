@@ -9,7 +9,7 @@ constexpr char kInputStream[] = "image";
 constexpr char kOutputStreamSegmentationMask[] = "segmentation_mask";
 
 
-CalculatorGraphConfig config = ParseTextProtoOrDie<CalculatorGraphConfig>(R"pb(
+mediapipe::CalculatorGraphConfig config = mediapipe::ParseTextProtoOrDie<mediapipe::CalculatorGraphConfig>(R"pb(
 # MediaPipe graph to detect/predict pose landmarks. (CPU input, and inference is
 # executed on CPU.) This graph tries to skip pose detection as much as possible
 # by using previously detected/predicted landmarks for new images.
@@ -310,7 +310,8 @@ node: {
 }
       )pb");
 
-CalculatorGraph graph;
+mediapipe::CalculatorGraph graph;
+mediapipe::OutputStreamPoller poller;
 
 float* segmentation_mask = nullptr;
 
@@ -319,7 +320,7 @@ absl::Status InitPoseTracking() {
 	MP_RETURN_IF_ERROR(graph.Initialize(config));
 	
 	LOG(INFO) << "Start running the calculator graph.";
-	ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller, graph.AddOutputStreamPoller(kOutputStreamSegmentationMask));
+	ASSIGN_OR_RETURN(poller, graph.AddOutputStreamPoller(kOutputStreamSegmentationMask));
 	MP_RETURN_IF_ERROR(graph.StartRun({}));
 	return absl::OkStatus();
 }
@@ -333,7 +334,7 @@ absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data,
 	int number_Of_channels = 3; // SRGB format
 	int byte_depth = 1; // SRGB format
 	int width_step = width * number_Of_channels * 1;
-    auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, width_step, pixel_data);
+    auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data);
 
 	// Send image packet into the graph.
     MP_RETURN_IF_ERROR(graph.AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame.release()).At(mediapipe::Timestamp(frame_timestamp_us))));
@@ -345,7 +346,7 @@ absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data,
     auto& output_frame = packet.Get<mediapipe::ImageFrame>();
 
 	int segmentation_mask_size = width * height; // VEC32F1
-	output_frame.CopyToBuffer(dst_segmentation_mask, segmentation_mask_size);
+	output_frame.CopyToBuffer(output_segmentation_mask, segmentation_mask_size);
 
 	return absl::OkStatus();
 }
