@@ -50,3 +50,16 @@ cc_library(
         "@com_google_absl//absl/flags:parse",
     ],
 )
+
+cc_binary(
+    name = "PoseTrackingCpu",
+    srcs = ["pose_tracking_cpu_lib.cc",
+            "pose_tracking_cpu_lib.h"],
+    deps = [
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/formats:image_frame",
+        "//mediapipe/framework/port:parse_text_proto",
+        "//mediapipe/framework/port:status",
+    ],
+    linkshared = 1,
+)
