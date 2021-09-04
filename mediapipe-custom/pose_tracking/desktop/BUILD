@@ -68,7 +68,7 @@ cc_binary(
         "//mediapipe/framework/formats:image_frame",
         "//mediapipe/framework/port:parse_text_proto",
         "//mediapipe/framework/port:status",
-    #     "//mediapipe/modules/pose_landmark:pose_landmark_cpu",
+        "//mediapipe/modules/pose_landmark:pose_landmark_cpu",
         "//mediapipe/calculators/core:flow_limiter_calculator",
     ],
     linkshared = 1,
