@@ -24,8 +24,8 @@ jobs:
         Invoke-WebRequest https://github.com/opencv/opencv/releases/download/3.4.10/opencv-3.4.10-vc14_vc15.exe -OutFile opencv.exe
         .\opencv.exe -o"C:" -y
         xcopy /e /i mediapipe-custom mediapipe\mediapipe-custom
-        cd mediapipe && bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe-custom/pose_tracking/desktop:pose_tracking_cpu
-        # cd mediapipe && bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe-custom/pose_tracking/desktop:PoseTrackingCpu
+        # cd mediapipe && bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe-custom/pose_tracking/desktop:pose_tracking_cpu
+        cd mediapipe && bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe-custom/pose_tracking/desktop:pose_tracking_cpu_lib
     
     - name: The job has succeeded
       if: ${{ success() }}

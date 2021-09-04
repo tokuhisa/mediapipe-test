@@ -315,6 +315,10 @@ std::unique_ptr<mediapipe::OutputStreamPoller> poller;
 
 float* segmentation_mask = nullptr;
 
+CPPLIBRARY_API void test_pose_tracking(void)
+{
+}
+
 absl::Status InitPoseTracking() {
 	LOG(INFO) << "Initialize the calculator graph.";
 	MP_RETURN_IF_ERROR(graph.Initialize(config));
