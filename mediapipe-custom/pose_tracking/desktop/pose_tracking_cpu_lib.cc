@@ -322,7 +322,7 @@ absl::Status InitPoseTracking() {
 	LOG(INFO) << "Start running the calculator graph.";
 
 	auto status_or_poller = graph.AddOutputStreamPoller(kOutputStreamSegmentationMask);
-	poller = absl::make_unique<mediapipe::OutputStreamPoller>(std::move(status_or_poller.ValueOrDie()));
+	poller = absl::make_unique<mediapipe::OutputStreamPoller>(std::move(status_or_poller.value()));
 
 	MP_RETURN_IF_ERROR(graph.StartRun({}));
 	
