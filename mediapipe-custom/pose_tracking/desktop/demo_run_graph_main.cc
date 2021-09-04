@@ -117,6 +117,8 @@ absl::Status RunMPPGraph() {
     MP_RETURN_IF_ERROR(graph.AddPacketToInputStream(
         kInputStream, mediapipe::Adopt(input_frame.release())
                           .At(mediapipe::Timestamp(frame_timestamp_us))));
+    
+    if (poller.QueueSize() == 0) continue;
 
     // Get the graph result packet, or stop if that fails.
     mediapipe::Packet packet;
