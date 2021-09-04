@@ -53,7 +53,7 @@ cc_library(
 )
 
 cc_binary(
-    name = "pose_tracking_cpu_lib",
+    name = "libposetrackingcpu.dll"",
     srcs = ["pose_tracking_cpu_lib.cc",
             "pose_tracking_cpu_lib.h"],
     deps = [
@@ -61,6 +61,9 @@ cc_binary(
         "//mediapipe/framework/formats:image_frame",
         "//mediapipe/framework/port:parse_text_proto",
         "//mediapipe/framework/port:status",
+        "//mediapipe/modules/pose_landmark:pose_landmark_cpu",
+        "//mediapipe/calculators/core:flow_limiter_calculator",
     ],
-    linkshared = 1,
+    linkshared = True,
+    linkstatic = True,
 )
