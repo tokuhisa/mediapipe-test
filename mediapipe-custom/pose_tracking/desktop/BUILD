@@ -53,7 +53,7 @@ cc_library(
 )
 
 cc_binary(
-    name = "libposetrackingcpu.dll"",
+    name = "libposetrackingcpu.dll",
     srcs = ["pose_tracking_cpu_lib.cc",
             "pose_tracking_cpu_lib.h"],
     deps = [

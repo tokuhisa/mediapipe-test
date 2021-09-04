@@ -25,7 +25,7 @@ jobs:
         .\opencv.exe -o"C:" -y
         xcopy /e /i mediapipe-custom mediapipe\mediapipe-custom
         cd mediapipe && bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe-custom/pose_tracking/desktop:pose_tracking_cpu
-        # cd mediapipe && bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe-custom/pose_tracking/desktop:pose_tracking_cpu_lib
+        # cd mediapipe && bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe-custom/pose_tracking/desktop:libposetrackingcpu.dll
     
     - name: The job has succeeded
       if: ${{ success() }}
