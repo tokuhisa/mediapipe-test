@@ -21,6 +21,7 @@ cc_binary(
     deps = [
         "//mediapipe-custom/pose_tracking/desktop:demo_run_graph_main",
         "//mediapipe/modules/pose_landmark:pose_landmark_cpu",
+        "//mediapipe/calculators/core:flow_limiter_calculator",
     ],
 )
 
