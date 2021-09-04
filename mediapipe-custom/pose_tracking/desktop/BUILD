@@ -52,18 +52,24 @@ cc_library(
     ],
 )
 
+
+filegroup(
+    name = "srcs",
+    srcs = glob(["**"]),
+    visibility = ["//mediapipe/examples:__subpackages__"],
+)
+
 cc_binary(
-    name = "libposetrackingcpu.dll",
+    name = "pose_tracking_cpu_lib",
     srcs = ["pose_tracking_cpu_lib.cc",
             "pose_tracking_cpu_lib.h"],
-    deps = [
-        "//mediapipe/framework:calculator_framework",
-        "//mediapipe/framework/formats:image_frame",
-        "//mediapipe/framework/port:parse_text_proto",
-        "//mediapipe/framework/port:status",
-        "//mediapipe/modules/pose_landmark:pose_landmark_cpu",
-        "//mediapipe/calculators/core:flow_limiter_calculator",
-    ],
-    linkshared = True,
-    linkstatic = True,
+    # deps = [
+    #     "//mediapipe/framework:calculator_framework",
+    #     "//mediapipe/framework/formats:image_frame",
+    #     "//mediapipe/framework/port:parse_text_proto",
+    #     "//mediapipe/framework/port:status",
+    #     "//mediapipe/modules/pose_landmark:pose_landmark_cpu",
+    #     "//mediapipe/calculators/core:flow_limiter_calculator",
+    # ],
+    linkshared = 1,
 )
