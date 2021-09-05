@@ -8,7 +8,7 @@
 
 std::unique_ptr<mediapipe::CalculatorGraph> graph;
 std::unique_ptr<mediapipe::OutputStreamPoller> poller;
-std::unique_ptr<mediapipe::ImageFrame> segmentation_mask;
+auto segmentation_mask = absl::make_unique<mediapipe::ImageFrame>();;
 
 // float* segmentation_mask = nullptr;
 
@@ -355,7 +355,7 @@ absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data,
 	}
 	
 	auto& output_frame = packet.Get<mediapipe::ImageFrame>();
-	segmentation_mask = absl::make_unique<mediapipe::ImageFrame>(&output_frame);
+	segmentation_mask->CopyFrom(&output_frame, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
 
 	return absl::OkStatus();
 }
