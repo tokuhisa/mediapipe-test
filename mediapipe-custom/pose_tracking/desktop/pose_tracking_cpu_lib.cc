@@ -353,8 +353,9 @@ absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data,
     if (!poller->Next(&packet)) {
 		return absl::UnavailableError("Could not get segmentation_mask.");
 	}
-
-	segmentation_mask = absl::make_unique<mediapipe::ImageFrame>(std::move(packet.Get<mediapipe::ImageFrame>()));
+	
+	auto& output_frame = packet.Get<mediapipe::ImageFrame>();
+	segmentation_mask = absl::make_unique<mediapipe::ImageFrame>(&output_frame);
 
 	return absl::OkStatus();
 }
