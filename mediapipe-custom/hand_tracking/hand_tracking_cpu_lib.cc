@@ -11,3 +11,12 @@ CPPLIBRARY_API void count_init(void)
 {
 	count = 0;
 }
+
+
+CPPLIBRARY_API void test_uint8_array(uint8* data) {
+
+}
+
+CPPLIBRARY_API void test_float_array(float* data) {
+	
+}
