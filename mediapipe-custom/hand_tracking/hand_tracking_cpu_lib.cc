@@ -57,5 +57,5 @@ CPPLIBRARY_API void create_image_frame4(int width, int height, uint8* input_pixe
 CPPLIBRARY_API void create_image_frame5(int width, int height, float* output_frame)
 {
     auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::VEC32F1, width, height, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
-	input_frame->CopyToBuffer(output_frame, width * height)
+	input_frame->CopyToBuffer(output_frame, width * height);
 }
