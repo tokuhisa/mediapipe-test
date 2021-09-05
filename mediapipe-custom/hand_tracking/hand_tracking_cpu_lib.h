@@ -17,4 +17,5 @@ extern "C"
 	CPPLIBRARY_API void create_image_frame2(int width, int height, uint8* input_pixel_data);
 	CPPLIBRARY_API void create_image_frame3(int width, int height, uint8* input_pixel_data);
 	CPPLIBRARY_API void create_image_frame4(int width, int height, uint8* input_pixel_data);
+	CPPLIBRARY_API void create_image_frame5(int width, int height, float* output_frame);
 }
