@@ -354,7 +354,7 @@ CPPLIBRARY_API int process_pose_tracking(int width, int height, uint8* input_pix
 
 CPPLIBRARY_API int get_segmentation_mask(int width, int height, float* output_segmentation_mask) {
 	int segmentation_mask_size = width * height; // VEC32F1
-	if (segmentation_mask) {
+	if (segmentation_mask && segmentation_mask->Width() == width && segmentation_mask->Height() == height) {
 		segmentation_mask->CopyToBuffer(output_segmentation_mask, segmentation_mask_size);
 		return 1;
 	} else {
