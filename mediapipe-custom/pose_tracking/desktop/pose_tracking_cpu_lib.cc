@@ -297,7 +297,9 @@ absl::Status InitPoseTracking() {
 	MP_RETURN_IF_ERROR(graph->Initialize(build_graph_config()));
 	
 	LOG(INFO) << "Start running the calculator graph.";
-
+	
+	char kInputStream[] = "image";
+    char kOutputStreamSegmentationMask[] = "segmentation_mask";
 	auto status_or_poller = graph->AddOutputStreamPoller(kOutputStreamSegmentationMask);
 	poller = absl::make_unique<mediapipe::OutputStreamPoller>(std::move(status_or_poller.value()));
 
@@ -318,6 +320,7 @@ absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data,
     auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data);
 
 	// Send image packet into the graph.
+	char kInputStream[] = "image";
     MP_RETURN_IF_ERROR(graph->AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame.release()).At(mediapipe::Timestamp(frame_timestamp_us))));
 
     // Get the graph result packet.
