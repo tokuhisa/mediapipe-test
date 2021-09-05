@@ -8,14 +8,14 @@
 // constexpr char kInputStream[] = "image";
 // constexpr char kOutputStreamSegmentationMask[] = "segmentation_mask";
 
-float count = 0;
-CPPLIBRARY_API float count_up(void)
+CPPLIBRARY_API void test_pose_tracking(void)
 {
-	count += 0.1;
-	return count;
 }
 
-CPPLIBRARY_API void count_init(void)
+CPPLIBRARY_API void init_pose_tracking(void)
 {
-	count = 0;
+}
+
+CPPLIBRARY_API void process_pose_tracking(int width, int height, uint8* input_pixel_data, float* output_segmentation_mask, int64 frame_timestamp_us)
+{
 }
