@@ -8,6 +8,7 @@
 
 std::unique_ptr<mediapipe::CalculatorGraph> graph;
 std::unique_ptr<mediapipe::OutputStreamPoller> poller;
+std::unique_ptr<mediapipe::ImageFrame> segmentation_mask;
 
 // float* segmentation_mask = nullptr;
 
@@ -329,7 +330,7 @@ CPPLIBRARY_API void init_pose_tracking(void)
 	InitPoseTracking();
 }
 
-absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data, float* output_segmentation_mask, int64 frame_timestamp_us) {
+absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us) {
 	int number_Of_channels = 3; // SRGB format
 	int byte_depth = 1; // SRGB format
 	int width_step = width * number_Of_channels * byte_depth;
@@ -353,15 +354,19 @@ absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data,
 		return absl::UnavailableError("Could not get segmentation_mask.");
 	}
 
-    auto& output_frame = packet.Get<mediapipe::ImageFrame>();
-
-	// int segmentation_mask_size = width * height; // VEC32F1
-	output_frame.CopyToBuffer(output_segmentation_mask, segmentation_mask_size);
+	segmentation_mask = absl::make_unique<mediapipe::ImageFrame>(std::move(packet.Get<mediapipe::ImageFrame>()));
 
 	return absl::OkStatus();
 }
 
-CPPLIBRARY_API void process_pose_tracking(int width, int height, uint8* input_pixel_data, float* output_segmentation_mask, int64 frame_timestamp_us)
+CPPLIBRARY_API void process_pose_tracking(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us)
 {
-	ProcessPoseTracking(width, height, input_pixel_data, output_segmentation_mask, frame_timestamp_us);
+	ProcessPoseTracking(width, height, input_pixel_data, frame_timestamp_us);
+}
+
+CPPLIBRARY_API void get_segmentation_mask(int width, int height, float* output_segmentation_mask) {
+	int segmentation_mask_size = width * height; // VEC32F1
+	if (segmentation_mask) {
+		segmentation_mask->CopyToBuffer(output_segmentation_mask, segmentation_mask_size);
+	}
 }
