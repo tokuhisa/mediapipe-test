@@ -52,7 +52,7 @@ cc_binary(
     srcs = ["hand_tracking_cpu_lib.cc",
             "hand_tracking_cpu_lib.h"],
     deps = [
-        "//mediapipe/framework:calculator_framework",
+        "@com_google_absl//absl/memory",
         "//mediapipe/framework/formats:image_frame",
     ],
     linkshared = 1,
