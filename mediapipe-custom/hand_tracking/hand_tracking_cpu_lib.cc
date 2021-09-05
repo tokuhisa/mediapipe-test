@@ -1,5 +1,7 @@
 #include "hand_tracking_cpu_lib.h"
 
+#include "mediapipe/framework/formats/image_frame.h"
+
 float count = 0;
 CPPLIBRARY_API float count_up(void)
 {
