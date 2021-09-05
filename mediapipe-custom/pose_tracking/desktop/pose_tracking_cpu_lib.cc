@@ -291,7 +291,7 @@ CPPLIBRARY_API void test_pose_tracking(void)
 {
 }
 
-CPPLIBRARY_API void create_image_frame(int width, int height, uint8* input_pixel_data)
+CPPLIBRARY_API void create_image_frame1(int width, int height, uint8* input_pixel_data)
 {
 	int number_Of_channels = 3; // SRGB format
 	int byte_depth = 1; // SRGB format
@@ -336,10 +336,10 @@ absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data,
     // auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data);
 
 	// Send image packet into the graph.
-	char kInputStream[] = "image";
+	// char kInputStream[] = "image";
     // MP_RETURN_IF_ERROR(graph->AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame.release()).At(mediapipe::Timestamp(frame_timestamp_us))));
-    auto input_frame = mediapipe::ImageFrame(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data);
-    MP_RETURN_IF_ERROR(graph->AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame).At(mediapipe::Timestamp(frame_timestamp_us))));
+    // auto input_frame = mediapipe::ImageFrame(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data);
+    MP_RETURN_IF_ERROR(graph->AddPacketToInputStream("image", mediapipe::MakePacket<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data).At(mediapipe::Timestamp(frame_timestamp_us))));
 
     // Get the graph result packet.
     // mediapipe::Packet packet;
