@@ -333,27 +333,30 @@ absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data,
 	int number_Of_channels = 3; // SRGB format
 	int byte_depth = 1; // SRGB format
 	int width_step = width * number_Of_channels * byte_depth;
+	
+    auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+	input_frame->CopyPixelData(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
     // auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data);
 
 	// Send image packet into the graph.
-	// char kInputStream[] = "image";
-    // MP_RETURN_IF_ERROR(graph->AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame.release()).At(mediapipe::Timestamp(frame_timestamp_us))));
+	char kInputStream[] = "image";
+    MP_RETURN_IF_ERROR(graph->AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame.release()).At(mediapipe::Timestamp(frame_timestamp_us))));
     // auto input_frame = mediapipe::ImageFrame(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data);
-    MP_RETURN_IF_ERROR(graph->AddPacketToInputStream("image", mediapipe::MakePacket<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data).At(mediapipe::Timestamp(frame_timestamp_us))));
+    // MP_RETURN_IF_ERROR(graph->AddPacketToInputStream("image", mediapipe::MakePacket<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data).At(mediapipe::Timestamp(frame_timestamp_us))));
 
     // Get the graph result packet.
-    // mediapipe::Packet packet;
-    // if (poller->QueueSize() == 0) {
-	// 	return absl::UnavailableError("Could not get segmentation_mask.");
-	// }
-    // if (!poller->Next(&packet)) {
-	// 	return absl::UnavailableError("Could not get segmentation_mask.");
-	// }
+    mediapipe::Packet packet;
+    if (poller->QueueSize() == 0) {
+		return absl::UnavailableError("Could not get segmentation_mask.");
+	}
+    if (!poller->Next(&packet)) {
+		return absl::UnavailableError("Could not get segmentation_mask.");
+	}
 
-    // auto& output_frame = packet.Get<mediapipe::ImageFrame>();
+    auto& output_frame = packet.Get<mediapipe::ImageFrame>();
 
 	// int segmentation_mask_size = width * height; // VEC32F1
-	// output_frame.CopyToBuffer(output_segmentation_mask, segmentation_mask_size);
+	output_frame.CopyToBuffer(output_segmentation_mask, segmentation_mask_size);
 
 	return absl::OkStatus();
 }
