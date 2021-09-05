@@ -9,7 +9,7 @@
 std::unique_ptr<mediapipe::CalculatorGraph> graph;
 std::unique_ptr<mediapipe::OutputStreamPoller> poller;
 
-float* segmentation_mask = nullptr;
+// float* segmentation_mask = nullptr;
 
 mediapipe::CalculatorGraphConfig build_graph_config(void) {
 	return mediapipe::ParseTextProtoOrDie<mediapipe::CalculatorGraphConfig>(R"pb(
@@ -324,18 +324,18 @@ absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data,
     MP_RETURN_IF_ERROR(graph->AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame.release()).At(mediapipe::Timestamp(frame_timestamp_us))));
 
     // Get the graph result packet.
-    mediapipe::Packet packet;
-    if (poller->QueueSize() == 0) {
-		return absl::UnavailableError("Could not get segmentation_mask.");
-	}
-    if (!poller->Next(&packet)) {
-		return absl::UnavailableError("Could not get segmentation_mask.");
-	}
+    // mediapipe::Packet packet;
+    // if (poller->QueueSize() == 0) {
+	// 	return absl::UnavailableError("Could not get segmentation_mask.");
+	// }
+    // if (!poller->Next(&packet)) {
+	// 	return absl::UnavailableError("Could not get segmentation_mask.");
+	// }
 
-    auto& output_frame = packet.Get<mediapipe::ImageFrame>();
+    // auto& output_frame = packet.Get<mediapipe::ImageFrame>();
 
-	int segmentation_mask_size = width * height; // VEC32F1
-	output_frame.CopyToBuffer(output_segmentation_mask, segmentation_mask_size);
+	// int segmentation_mask_size = width * height; // VEC32F1
+	// output_frame.CopyToBuffer(output_segmentation_mask, segmentation_mask_size);
 
 	return absl::OkStatus();
 }
