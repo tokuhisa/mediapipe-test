@@ -355,7 +355,7 @@ absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data,
 	}
 	
 	auto& output_frame = packet.Get<mediapipe::ImageFrame>();
-	segmentation_mask->CopyFrom(&output_frame, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+	segmentation_mask->CopyFrom(output_frame, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
 
 	return absl::OkStatus();
 }
