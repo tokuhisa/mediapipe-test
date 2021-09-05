@@ -291,6 +291,23 @@ CPPLIBRARY_API void test_pose_tracking(void)
 {
 }
 
+CPPLIBRARY_API void create_image_frame(int width, int height, uint8* input_pixel_data)
+{
+	int number_Of_channels = 3; // SRGB format
+	int byte_depth = 1; // SRGB format
+	int width_step = width * number_Of_channels * byte_depth;
+    auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data);
+}
+
+
+CPPLIBRARY_API void create_image_frame2(int width, int height, uint8* input_pixel_data)
+{
+	int number_Of_channels = 3; // SRGB format
+	int byte_depth = 1; // SRGB format
+	int width_step = width * number_Of_channels * byte_depth;
+    auto input_frame = mediapipe::ImageFrame(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data);
+}
+
 absl::Status InitPoseTracking() {
 	LOG(INFO) << "Initialize the calculator graph.";
 	graph = absl::make_unique<::mediapipe::CalculatorGraph>();
@@ -298,7 +315,6 @@ absl::Status InitPoseTracking() {
 	
 	LOG(INFO) << "Start running the calculator graph.";
 	
-	char kInputStream[] = "image";
     char kOutputStreamSegmentationMask[] = "segmentation_mask";
 	auto status_or_poller = graph->AddOutputStreamPoller(kOutputStreamSegmentationMask);
 	poller = absl::make_unique<mediapipe::OutputStreamPoller>(std::move(status_or_poller.value()));
@@ -316,12 +332,14 @@ CPPLIBRARY_API void init_pose_tracking(void)
 absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data, float* output_segmentation_mask, int64 frame_timestamp_us) {
 	int number_Of_channels = 3; // SRGB format
 	int byte_depth = 1; // SRGB format
-	int width_step = width * number_Of_channels * 1;
-    auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data);
+	int width_step = width * number_Of_channels * byte_depth;
+    // auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data);
 
 	// Send image packet into the graph.
 	char kInputStream[] = "image";
-    MP_RETURN_IF_ERROR(graph->AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame.release()).At(mediapipe::Timestamp(frame_timestamp_us))));
+    // MP_RETURN_IF_ERROR(graph->AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame.release()).At(mediapipe::Timestamp(frame_timestamp_us))));
+    auto input_frame = mediapipe::ImageFrame(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data);
+    MP_RETURN_IF_ERROR(graph->AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame).At(mediapipe::Timestamp(frame_timestamp_us))));
 
     // Get the graph result packet.
     // mediapipe::Packet packet;
