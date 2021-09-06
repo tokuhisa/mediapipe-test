@@ -353,3 +353,106 @@ CPPLIBRARY_API int get_segmentation_mask(int width, int height, float* output_se
 		return 14;
 	}
 }
+
+
+
+
+absl::Status ProcessPoseTrackingTest1(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us) {
+	int number_Of_channels = 3; // SRGB format
+	int byte_depth = 1; // SRGB format
+	int width_step = width * number_Of_channels * byte_depth;
+
+    auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+	input_frame->CopyPixelData(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+
+	return absl::OkStatus();
+}
+
+absl::Status ProcessPoseTrackingTest2(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us) {
+	int number_Of_channels = 3; // SRGB format
+	int byte_depth = 1; // SRGB format
+	int width_step = width * number_Of_channels * byte_depth;
+
+    auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+	input_frame->CopyPixelData(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+
+	// Send image packet into the graph.
+	char kInputStream[] = "image";
+    MP_RETURN_IF_ERROR(graph->AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame.release()).At(mediapipe::Timestamp(frame_timestamp_us))));
+
+	return absl::OkStatus();
+}
+
+absl::Status ProcessPoseTrackingTest3(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us) {
+	int number_Of_channels = 3; // SRGB format
+	int byte_depth = 1; // SRGB format
+	int width_step = width * number_Of_channels * byte_depth;
+
+    auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+	input_frame->CopyPixelData(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+
+	// Send image packet into the graph.
+	char kInputStream[] = "image";
+    MP_RETURN_IF_ERROR(graph->AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame.release()).At(mediapipe::Timestamp(frame_timestamp_us))));
+
+    // Get the graph result packet.
+    mediapipe::Packet packet;
+    if (poller->QueueSize() == 0) {
+		return absl::UnavailableError("Could not get segmentation_mask.");
+	}
+
+	return absl::OkStatus();
+}
+
+
+absl::Status ProcessPoseTrackingTest4(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us) {
+	int number_Of_channels = 3; // SRGB format
+	int byte_depth = 1; // SRGB format
+	int width_step = width * number_Of_channels * byte_depth;
+
+	auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+	input_frame->CopyPixelData(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+
+	// Send image packet into the graph.
+	char kInputStream[] = "image";
+    MP_RETURN_IF_ERROR(graph->AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame.release()).At(mediapipe::Timestamp(frame_timestamp_us))));
+
+    // Get the graph result packet.
+    mediapipe::Packet packet;
+    if (poller->QueueSize() == 0) {
+		return absl::UnavailableError("Could not get segmentation_mask.");
+	}
+    if (!poller->Next(&packet)) {
+		return absl::UnavailableError("Could not get segmentation_mask.");
+	}
+
+	return absl::OkStatus();
+}
+
+
+CPPLIBRARY_API int process_pose_tracking_test1(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us)
+{
+	absl::Status status = ProcessPoseTrackingTest1(width, height, input_pixel_data, frame_timestamp_us);
+	return status.raw_code();
+}
+
+
+CPPLIBRARY_API int process_pose_tracking_test2(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us)
+{
+	absl::Status status = ProcessPoseTrackingTest2(width, height, input_pixel_data, frame_timestamp_us);
+	return status.raw_code();
+}
+
+
+CPPLIBRARY_API int process_pose_tracking_test3(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us)
+{
+	absl::Status status = ProcessPoseTrackingTest3(width, height, input_pixel_data, frame_timestamp_us);
+	return status.raw_code();
+}
+
+
+CPPLIBRARY_API int process_pose_tracking_test4(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us)
+{
+	absl::Status status = ProcessPoseTrackingTest4(width, height, input_pixel_data, frame_timestamp_us);
+	return status.raw_code();
+}
