@@ -305,11 +305,7 @@ absl::Status InitPoseTracking() {
 CPPLIBRARY_API int init_pose_tracking(void)
 {
 	absl::Status status = InitPoseTracking();
-	if (status.ok()) {
-		return 1;
-	} else {
-		return 0;
-	}
+	return status.raw_code();
 }
 
 absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us) {
@@ -345,19 +341,15 @@ absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data,
 CPPLIBRARY_API int process_pose_tracking(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us)
 {
 	absl::Status status = ProcessPoseTracking(width, height, input_pixel_data, frame_timestamp_us);
-	if (status.ok()) {
-		return 1;
-	} else {
-		return 0;
-	}
+	return status.raw_code();
 }
 
 CPPLIBRARY_API int get_segmentation_mask(int width, int height, float* output_segmentation_mask) {
 	int segmentation_mask_size = width * height; // VEC32F1
 	if (segmentation_mask && segmentation_mask->Width() == width && segmentation_mask->Height() == height) {
 		segmentation_mask->CopyToBuffer(output_segmentation_mask, segmentation_mask_size);
-		return 1;
-	} else {
 		return 0;
+	} else {
+		return 14;
 	}
 }
