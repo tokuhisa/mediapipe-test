@@ -54,6 +54,11 @@ CPPLIBRARY_API void create_image_frame4(int width, int height, uint8* input_pixe
 	input_frame->CopyPixelData(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data, mediapipe::ImageFrame::kDefaultAlignmentBoundary); 
 }
 
+CPPLIBRARY_API uint8 test_data(uint8* input_pixel_data, int idx)
+{
+	return input_pixel_data[idx];
+}
+
 CPPLIBRARY_API void create_image_frame5(int width, int height, float* output_frame)
 {
     auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::VEC32F1, width, height, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
