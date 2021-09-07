@@ -21,11 +21,12 @@ jobs:
     - name: Build binary
       run: |
         pip install numpy
+        pip install argparse
         Invoke-WebRequest https://github.com/opencv/opencv/releases/download/3.4.10/opencv-3.4.10-vc14_vc15.exe -OutFile opencv.exe
         .\opencv.exe -o"C:" -y
         Invoke-WebRequest https://github.com/homuler/MediaPipeUnityPlugin/archive/refs/tags/v0.6.2.zip -OutFile MediaPipeUnityPlugin.zip
         Expand-Archive MediaPipeUnityPlugin.zip MediaPipeUnityPlugin
-        cd MediaPipeUnityPlugin\MediaPipeUnityPlugin-0.6.2 && python build.py build --desktop cpu --include_opencv_libs -v
+        cd MediaPipeUnityPlugin\MediaPipeUnityPlugin-0.6.2 && PYTHON_BIN_PATH=C:\msys64\mingw64\bin\python.exe python build.py build --desktop cpu --include_opencv_libs -v
     
     - name: The job has succeeded
       if: ${{ success() }}
