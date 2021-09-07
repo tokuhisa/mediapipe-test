@@ -24,20 +24,22 @@ jobs:
         pip install argparse
         Invoke-WebRequest https://github.com/opencv/opencv/releases/download/3.4.10/opencv-3.4.10-vc14_vc15.exe -OutFile opencv.exe
         .\opencv.exe -o"C:" -y
-        Invoke-WebRequest https://github.com/homuler/MediaPipeUnityPlugin/archive/refs/tags/v0.6.2.zip -OutFile MediaPipeUnityPlugin.zip
-        Expand-Archive MediaPipeUnityPlugin.zip MediaPipeUnityPlugin
+      # Invoke-WebRequest https://github.com/homuler/MediaPipeUnityPlugin/archive/refs/tags/v0.6.2.zip -OutFile MediaPipeUnityPlugin.zip
+      # Expand-Archive MediaPipeUnityPlugin.zip MediaPipeUnityPlugin
 
     - name: Build binary
       shell: bash
       run: |
-        cd MediaPipeUnityPlugin\MediaPipeUnityPlugin-0.6.2 && PYTHON_BIN_PATH=C:\msys64\mingw64\bin\python.exe python build.py build --desktop cpu --include_opencv_libs -v
+        wget https://github.com/homuler/MediaPipeUnityPlugin/archive/refs/tags/v0.6.2.zip -O MediaPipeUnityPlugin.zip
+        unzip MediaPipeUnityPlugin.zip
+        cd MediaPipeUnityPlugin-0.6.2 && PYTHON_BIN_PATH=C:\msys64\mingw64\bin\python.exe python build.py build --desktop cpu --include_opencv_libs -v
     
     - name: The job has succeeded
       if: ${{ success() }}
       uses: actions/upload-artifact@v2
       with:
         name: MediaPipeUnityPlugin
-        path: MediaPipeUnityPlugin\MediaPipeUnityPlugin-0.6.2
+        path: MediaPipeUnityPlugin-0.6.2
 
     - name: Setup tmate session
       if: ${{ failure() }}
