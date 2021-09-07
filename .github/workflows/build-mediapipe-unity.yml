@@ -19,20 +19,22 @@ jobs:
         key: ${{ runner.os }}-${{ hashFiles('WORKSPACE') }}
 
     - name: Download MediaPipeUnityPlugin
+      working-directory: unity
       run: |
         pip install numpy
         pip install argparse
         Invoke-WebRequest https://github.com/opencv/opencv/releases/download/3.4.10/opencv-3.4.10-vc14_vc15.exe -OutFile opencv.exe
         .\opencv.exe -o"C:" -y
-      # Invoke-WebRequest https://github.com/homuler/MediaPipeUnityPlugin/archive/refs/tags/v0.6.2.zip -OutFile MediaPipeUnityPlugin.zip
-      # Expand-Archive MediaPipeUnityPlugin.zip MediaPipeUnityPlugin
-
-    - name: Build binary
-      shell: bash
-      run: |
         Invoke-WebRequest https://github.com/homuler/MediaPipeUnityPlugin/archive/refs/tags/v0.6.2.zip -OutFile MediaPipeUnityPlugin.zip
         Expand-Archive MediaPipeUnityPlugin.zip MediaPipeUnityPlugin
+      # bash -c "cd MediaPipeUnityPlugin/MediaPipeUnityPlugin-0.6.2 && PYTHON_BIN_PATH=C:\msys64\mingw64\bin\python.exe python build.py build --desktop cpu --include_opencv_libs -v"
+    
+    - name: Build binary
+      working-directory: unity
+      shell: bash
+      run: |
         cd MediaPipeUnityPlugin/MediaPipeUnityPlugin-0.6.2 && PYTHON_BIN_PATH=C:\msys64\mingw64\bin\python.exe python build.py build --desktop cpu --include_opencv_libs -v
+    
     
     - name: The job has succeeded
       if: ${{ success() }}
