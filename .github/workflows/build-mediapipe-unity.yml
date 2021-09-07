@@ -46,7 +46,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: MediaPipeUnityPlugin
-        path: MediaPipeUnityPlugin/MediaPipeUnityPlugin-0.6.2
+        path: MediaPipeUnityPlugin/MediaPipeUnityPlugin-0.6.2/Packages
 
     - name: Setup tmate session
       if: ${{ failure() }}
