@@ -26,8 +26,7 @@ jobs:
         .\opencv.exe -o"C:" -y
         Invoke-WebRequest https://github.com/homuler/MediaPipeUnityPlugin/archive/refs/tags/v0.6.2.zip -OutFile MediaPipeUnityPlugin.zip
         Expand-Archive MediaPipeUnityPlugin.zip MediaPipeUnityPlugin
-        echo "PYTHON_BIN_PATH=C:\msys64\mingw64\bin\python.exe" >> $env:GITHUB_ENV
-        echo $PYTHON_BIN_PATH
+        set PYTHON_BIN_PATH=C:\msys64\mingw64\bin\python.exe
         cd MediaPipeUnityPlugin\MediaPipeUnityPlugin-0.6.2 && python build.py build --desktop cpu --include_opencv_libs -v
     
     - name: The job has succeeded
