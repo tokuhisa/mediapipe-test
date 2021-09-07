@@ -7,10 +7,10 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Initialize
-      uses: actions/checkout@v2
-      with:
-        submodules: true
+    # - name: Initialize
+    #   uses: actions/checkout@v2
+    #   with:
+    #     submodules: true
 
     - name: Cache Bazel
       uses: actions/cache@v2
@@ -18,7 +18,7 @@ jobs:
         path: ~/.cache/bazel
         key: ${{ runner.os }}-${{ hashFiles('WORKSPACE') }}
 
-    - name: Build binary
+    - name: Download MediaPipeUnityPlugin
       run: |
         pip install numpy
         pip install argparse
@@ -26,8 +26,11 @@ jobs:
         .\opencv.exe -o"C:" -y
         Invoke-WebRequest https://github.com/homuler/MediaPipeUnityPlugin/archive/refs/tags/v0.6.2.zip -OutFile MediaPipeUnityPlugin.zip
         Expand-Archive MediaPipeUnityPlugin.zip MediaPipeUnityPlugin
-        set PYTHON_BIN_PATH=C:\msys64\mingw64\bin\python.exe
-        cd MediaPipeUnityPlugin\MediaPipeUnityPlugin-0.6.2 && python build.py build --desktop cpu --include_opencv_libs -v
+
+    - name: Build binary
+      shell: bash
+      run: |
+        cd MediaPipeUnityPlugin\MediaPipeUnityPlugin-0.6.2 && PYTHON_BIN_PATH=C:\msys64\mingw64\bin\python.exe python build.py build --desktop cpu --include_opencv_libs -v
     
     - name: The job has succeeded
       if: ${{ success() }}
