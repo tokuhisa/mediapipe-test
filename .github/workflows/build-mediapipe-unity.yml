@@ -32,7 +32,7 @@ jobs:
         .\opencv.exe -o"C:" -y
         Invoke-WebRequest https://github.com/homuler/MediaPipeUnityPlugin/archive/refs/tags/v0.6.2.zip -OutFile MediaPipeUnityPlugin.zip
         Expand-Archive MediaPipeUnityPlugin.zip MediaPipeUnityPlugin
-        cd MediaPipeUnityPlugin/MediaPipeUnityPlugin-0.6.2 && bash -c "PYTHON_BIN_PATH=C:\hostedtoolcache\windows\Python\3.7.9\x64\python.exe python build.py build --desktop cpu --include_opencv_libs -v"
+        cd MediaPipeUnityPlugin/MediaPipeUnityPlugin-0.6.2 && bash -c "PYTHON_BIN_PATH=C:\hostedtoolcache\windows\Python\3.9.6\x64\python.exe python build.py build --desktop cpu --include_opencv_libs -v"
     
     # - name: Build binary
     #   working-directory: unity
