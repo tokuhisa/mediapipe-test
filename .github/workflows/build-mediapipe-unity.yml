@@ -20,9 +20,13 @@ jobs:
 
     - name: Build binary
       # working-directory: unity
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
       run: |
-        pip3 install numpy
-        pip3 install argparse
+        python --version --version && which python
+        pip install numpy
+        pip install argparse
         Invoke-WebRequest https://github.com/opencv/opencv/releases/download/3.4.10/opencv-3.4.10-vc14_vc15.exe -OutFile opencv.exe
         .\opencv.exe -o"C:" -y
         Invoke-WebRequest https://github.com/homuler/MediaPipeUnityPlugin/archive/refs/tags/v0.6.2.zip -OutFile MediaPipeUnityPlugin.zip
