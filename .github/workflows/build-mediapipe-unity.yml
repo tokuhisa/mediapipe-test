@@ -30,16 +30,16 @@ jobs:
     - name: Build binary
       shell: bash
       run: |
-        wget https://github.com/homuler/MediaPipeUnityPlugin/archive/refs/tags/v0.6.2.zip -O MediaPipeUnityPlugin.zip
-        unzip MediaPipeUnityPlugin.zip
-        cd MediaPipeUnityPlugin-0.6.2 && PYTHON_BIN_PATH=C:\msys64\mingw64\bin\python.exe python build.py build --desktop cpu --include_opencv_libs -v
+        Invoke-WebRequest https://github.com/homuler/MediaPipeUnityPlugin/archive/refs/tags/v0.6.2.zip -OutFile MediaPipeUnityPlugin.zip
+        Expand-Archive MediaPipeUnityPlugin.zip MediaPipeUnityPlugin
+        cd MediaPipeUnityPlugin/MediaPipeUnityPlugin-0.6.2 && PYTHON_BIN_PATH=C:\msys64\mingw64\bin\python.exe python build.py build --desktop cpu --include_opencv_libs -v
     
     - name: The job has succeeded
       if: ${{ success() }}
       uses: actions/upload-artifact@v2
       with:
         name: MediaPipeUnityPlugin
-        path: MediaPipeUnityPlugin-0.6.2
+        path: MediaPipeUnityPlugin/MediaPipeUnityPlugin-0.6.2
 
     - name: Setup tmate session
       if: ${{ failure() }}
