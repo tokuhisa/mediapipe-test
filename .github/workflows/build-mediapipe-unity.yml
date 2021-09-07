@@ -18,9 +18,6 @@ jobs:
         path: ~/.cache/bazel
         key: ${{ runner.os }}-${{ hashFiles('WORKSPACE') }}
 
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
-      timeout-minutes: 1
     - name: Build binary
       # working-directory: unity
       run: |
