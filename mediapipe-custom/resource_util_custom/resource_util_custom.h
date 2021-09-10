@@ -2,6 +2,10 @@
 
 #define CPPLIBRARY_API __declspec(dllexport) 
 
+
+#include <csetjmp>
+#include <csignal>
+#include <string>
 #include "mediapipe/util/resource_util_custom.h"
 
 
