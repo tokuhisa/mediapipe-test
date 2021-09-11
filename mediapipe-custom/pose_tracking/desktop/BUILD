@@ -74,3 +74,24 @@ cc_binary(
     ],
     linkshared = 1,
 )
+
+
+cc_binary(
+    name = "pose_tracking_camera_lib",
+    srcs = ["pose_tracking_camera_lib.cc",
+            "pose_tracking_camera_lib.h"],
+    deps = [
+        "//mediapipe/framework:calculator_framework",
+        "//mediapipe/framework/formats:image_frame",
+        "//mediapipe/framework/formats:image_frame_opencv",
+        "//mediapipe/framework/port:parse_text_proto",
+        "//mediapipe/framework/port:file_helpers",
+        "//mediapipe/framework/port:opencv_highgui",
+        "//mediapipe/framework/port:opencv_imgproc",
+        "//mediapipe/framework/port:opencv_video",
+        "//mediapipe/framework/port:status",
+        "//mediapipe/modules/pose_landmark:pose_landmark_cpu",
+        "//mediapipe/calculators/core:flow_limiter_calculator",
+    ],
+    linkshared = 1,
+)

@@ -291,7 +291,7 @@ node: {
 mediapipe::CalculatorGraphConfig build_graph_config_from_file(void) {
   
   std::string calculator_graph_config_contents;
-  mediapipe::file::GetContents("graph.pb", &calculator_graph_config_contents);
+  mediapipe::file::GetContents("graph.pbtxt", &calculator_graph_config_contents);
   LOG(INFO) << "Get calculator graph config contents: " << calculator_graph_config_contents;
   return mediapipe::ParseTextProtoOrDie<mediapipe::CalculatorGraphConfig>(calculator_graph_config_contents);
 
@@ -326,7 +326,8 @@ absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data,
 	int width_step = width * number_Of_channels * byte_depth;
 	
   auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
-	input_frame->CopyPixelData(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+	// input_frame->CopyPixelData(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+	input_frame->CopyPixelData(mediapipe::ImageFormat::SRGB, width, height, input_pixel_data, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
     // auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data);
 
 	// Send image packet into the graph.
