@@ -305,7 +305,7 @@ absl::Status InitPoseTracking() {
 	
 	LOG(INFO) << "Start running the calculator graph.";
 	
-    char kOutputStreamSegmentationMask[] = "segmentation_mask";
+  char kOutputStreamSegmentationMask[] = "segmentation_mask";
 	auto status_or_poller = graph->AddOutputStreamPoller(kOutputStreamSegmentationMask);
 	poller = absl::make_unique<mediapipe::OutputStreamPoller>(std::move(status_or_poller.value()));
 
