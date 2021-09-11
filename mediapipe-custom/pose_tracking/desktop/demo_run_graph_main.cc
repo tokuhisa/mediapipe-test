@@ -143,7 +143,7 @@ absl::Status RunMPPGraph() {
     mediapipe::Packet landmarks_packet;
     if (!landmarks_poller.Next(&landmarks_packet)) continue;
 	
-	  auto& landmarks = landmarks_packet.Get<mediapipe::NormalizedLandmarkList>();
+	  auto& landmarks = landmarks_packet.Get<mediapipe::LandmarkList>();
     
     if (save_video) {
       if (!writer.isOpened()) {
