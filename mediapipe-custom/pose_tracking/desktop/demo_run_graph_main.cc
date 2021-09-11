@@ -26,6 +26,7 @@
 #include "mediapipe/framework/port/opencv_video_inc.h"
 #include "mediapipe/framework/port/parse_text_proto.h"
 #include "mediapipe/framework/port/status.h"
+#include "mediapipe/framework/formats/landmark.pb.h"
 
 constexpr char kInputStream[] = "image";
 constexpr char kOutputStreamSegmentationMask[] = "segmentation_mask";
@@ -138,12 +139,11 @@ absl::Status RunMPPGraph() {
     cv::Mat output_frame_mat = mediapipe::formats::MatView(&output_frame);
     // cv::cvtColor(output_frame_mat, output_frame_mat, cv::COLOR_RGB2BGR);
 
-    landmarks_poller
     if (landmarks_poller.QueueSize() == 0) continue;
     mediapipe::Packet landmarks_packet;
     if (!landmarks_poller.Next(&landmarks_packet)) continue;
 	
-	  auto& landmarks = packet.Get<mediapipe::NormalizedLandmarkList>();
+	  auto& landmarks = landmarks_packet.Get<mediapipe::NormalizedLandmarkList>();
     
     if (save_video) {
       if (!writer.isOpened()) {
