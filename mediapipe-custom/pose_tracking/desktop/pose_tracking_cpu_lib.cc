@@ -380,21 +380,21 @@ CPPLIBRARY_API int get_segmentation_mask(int width, int height, float* output_se
   }
 }
 
-absl::Status GetLandmarks() {
-  // Get the graph result packet.
-  mediapipe::Packet packet;
-  if (landmarks_poller->QueueSize() == 0) {
-		return absl::UnavailableError("landmarks_poller->QueueSize() is 0");
-	}
-  if (!landmarks_poller->Next(&packet)) {
-		return absl::UnavailableError("Could not get landmarks.");
-	}
+// absl::Status GetLandmarks() {
+//   // Get the graph result packet.
+//   mediapipe::Packet packet;
+//   if (landmarks_poller->QueueSize() == 0) {
+// 		return absl::UnavailableError("landmarks_poller->QueueSize() is 0");
+// 	}
+//   if (!landmarks_poller->Next(&packet)) {
+// 		return absl::UnavailableError("Could not get landmarks.");
+// 	}
 	
-	auto& landmark_list = packet.Get<mediapipe::NormalizedLandmarkList>();
-  landmarks = absl::make_unique<mediapipe::NormalizedLandmarkList>(landmark_list);
+// 	auto& landmark_list = packet.Get<mediapipe::NormalizedLandmarkList>();
+//   landmarks = absl::make_unique<mediapipe::NormalizedLandmarkList>(landmark_list);
 
-	return absl::OkStatus();
-}
+// 	return absl::OkStatus();
+// }
 
 CPPLIBRARY_API int get_landmarks(float* x_array, float* y_array, float* z_array, float* visibilities, float* presences, int size) {
   // absl::Status status = GetLandmarks();
@@ -412,14 +412,14 @@ CPPLIBRARY_API int get_landmarks(float* x_array, float* y_array, float* z_array,
 	auto& landmarks = packet.Get<mediapipe::NormalizedLandmarkList>();
 
   if (status.raw_code() == 0) {
-    int landmark_size = landmarks->landmark_size();
+    int landmark_size = landmarks.landmark_size();
     if (landmark_size == size) {
       for (int i = 0; i < landmark_size; i++) {
-        x_array[i] = landmarks->landmark(i).x();
-        y_array[i] = landmarks->landmark(i).y();
-        z_array[i] = landmarks->landmark(i).z();
-        visibilities[i] = landmarks->landmark(i).visibility();
-        presences[i] = landmarks->landmark(i).presence();
+        x_array[i] = landmarks.landmark(i).x();
+        y_array[i] = landmarks.landmark(i).y();
+        z_array[i] = landmarks.landmark(i).z();
+        visibilities[i] = landmarks.landmark(i).visibility();
+        presences[i] = landmarks.landmark(i).presence();
       }
       return 0;
     } else {
