@@ -5,11 +5,14 @@
 #include "mediapipe/framework/port/parse_text_proto.h"
 #include "mediapipe/framework/port/status.h"
 #include "mediapipe/framework/port/file_helpers.h"
+#include "mediapipe/framework/formats/landmark.pb.h"
 
 
 std::unique_ptr<mediapipe::CalculatorGraph> graph;
-std::unique_ptr<mediapipe::OutputStreamPoller> poller;
+std::unique_ptr<mediapipe::OutputStreamPoller> segmentation_mask_poller;
+std::unique_ptr<mediapipe::OutputStreamPoller> landmarks_poller;
 auto segmentation_mask = absl::make_unique<mediapipe::ImageFrame>();
+auto landmarks = absl::make_unique<mediapipe::NormalizedLandmarkList>();
 
 mediapipe::CalculatorGraphConfig build_graph_config(void) {
 	return mediapipe::ParseTextProtoOrDie<mediapipe::CalculatorGraphConfig>(R"pb(
@@ -306,8 +309,12 @@ absl::Status InitPoseTracking() {
 	LOG(INFO) << "Start running the calculator graph.";
 	
   char kOutputStreamSegmentationMask[] = "segmentation_mask";
-	auto status_or_poller = graph->AddOutputStreamPoller(kOutputStreamSegmentationMask);
-	poller = absl::make_unique<mediapipe::OutputStreamPoller>(std::move(status_or_poller.value()));
+	auto segmentation_mask_sop = graph->AddOutputStreamPoller(kOutputStreamSegmentationMask);
+	segmentation_mask_poller = absl::make_unique<mediapipe::OutputStreamPoller>(std::move(segmentation_mask_sop.value()));
+
+  char kOutputStreamLandmarks[] = "pose_world_landmarks";
+	auto landmarks_sop = graph->AddOutputStreamPoller(kOutputStreamLandmarks);
+	landmarks_poller = absl::make_unique<mediapipe::OutputStreamPoller>(std::move(landmarks_sop.value()));
 
 	MP_RETURN_IF_ERROR(graph->StartRun({}));
 	
@@ -326,27 +333,11 @@ absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data,
 	int width_step = width * number_Of_channels * byte_depth;
 	
   auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
-	// input_frame->CopyPixelData(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
 	input_frame->CopyPixelData(mediapipe::ImageFormat::SRGB, width, height, input_pixel_data, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
-    // auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data);
 
 	// Send image packet into the graph.
 	char kInputStream[] = "image";
   MP_RETURN_IF_ERROR(graph->AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame.release()).At(mediapipe::Timestamp(frame_timestamp_us))));
-    // auto input_frame = mediapipe::ImageFrame(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data);
-    // MP_RETURN_IF_ERROR(graph->AddPacketToInputStream("image", mediapipe::MakePacket<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data).At(mediapipe::Timestamp(frame_timestamp_us))));
-
-    // Get the graph result packet.
-  mediapipe::Packet packet;
-  if (poller->QueueSize() == 0) {
-		return absl::UnavailableError("Could not get segmentation_mask.");
-	}
-  if (!poller->Next(&packet)) {
-		return absl::UnavailableError("Could not get segmentation_mask.");
-	}
-	
-	auto& output_frame = packet.Get<mediapipe::ImageFrame>();
-	segmentation_mask->CopyFrom(output_frame, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
 
 	return absl::OkStatus();
 }
@@ -357,115 +348,72 @@ CPPLIBRARY_API int process_pose_tracking(int width, int height, uint8* input_pix
 	return status.raw_code();
 }
 
+absl::Status GetSegmentationMask() {
+  // Get the graph result packet.
+  mediapipe::Packet packet;
+  if (segmentation_mask_poller->QueueSize() == 0) {
+		return absl::UnavailableError("segmentation_mask_poller->QueueSize() is 0.");
+	}
+  if (!segmentation_mask_poller->Next(&packet)) {
+		return absl::UnavailableError("Could not get segmentation_mask.");
+	}
+	
+	auto& output_frame = packet.Get<mediapipe::ImageFrame>();
+	segmentation_mask->CopyFrom(output_frame, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+
+	return absl::OkStatus();
+}
+
 CPPLIBRARY_API int get_segmentation_mask(int width, int height, float* output_segmentation_mask) {
-	int segmentation_mask_size = width * height; // VEC32F1
-	if (segmentation_mask && segmentation_mask->Width() == width && segmentation_mask->Height() == height) {
-		segmentation_mask->CopyToBuffer(output_segmentation_mask, segmentation_mask_size);
-		return 0;
-	} else {
-		return 14;
-	}
+  absl::Status status = GetSegmentationMask();
+
+  if (status.raw_code() == 0) {
+    int segmentation_mask_size = width * height; // VEC32F1
+    if (segmentation_mask && segmentation_mask->Width() == width && segmentation_mask->Height() == height) {
+      segmentation_mask->CopyToBuffer(output_segmentation_mask, segmentation_mask_size);
+      return 0;
+    } else {
+	    return -1;
+	  }
+  } else {
+    return status.raw_code();
+  }
 }
 
-
-
-
-absl::Status ProcessPoseTrackingTest1(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us) {
-	int number_Of_channels = 3; // SRGB format
-	int byte_depth = 1; // SRGB format
-	int width_step = width * number_Of_channels * byte_depth;
-
-    auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
-	input_frame->CopyPixelData(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+absl::Status GetLandmarks() {
+  // Get the graph result packet.
+  mediapipe::Packet packet;
+  if (landmarks_poller->QueueSize() == 0) {
+		return absl::UnavailableError("landmarks_poller->QueueSize() is 0");
+	}
+  if (!landmarks_poller->Next(&packet)) {
+		return absl::UnavailableError("Could not get landmarks.");
+	}
+	
+	auto& landmark_list = packet.Get<mediapipe::NormalizedLandmarkList>();
+  landmarks = absl::make_unique<mediapipe::NormalizedLandmarkList>(landmark_list);
 
 	return absl::OkStatus();
 }
 
-absl::Status ProcessPoseTrackingTest2(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us) {
-	int number_Of_channels = 3; // SRGB format
-	int byte_depth = 1; // SRGB format
-	int width_step = width * number_Of_channels * byte_depth;
+CPPLIBRARY_API int get_landmarks(float* x_array, float* y_array, float* z_array, float* visibilities, float* presences, int size) {
+  absl::Status status = GetLandmarks();
 
-    auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
-	input_frame->CopyPixelData(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
-
-	// Send image packet into the graph.
-	char kInputStream[] = "image";
-    MP_RETURN_IF_ERROR(graph->AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame.release()).At(mediapipe::Timestamp(frame_timestamp_us))));
-
-	return absl::OkStatus();
-}
-
-absl::Status ProcessPoseTrackingTest3(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us) {
-	int number_Of_channels = 3; // SRGB format
-	int byte_depth = 1; // SRGB format
-	int width_step = width * number_Of_channels * byte_depth;
-
-    auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
-	input_frame->CopyPixelData(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
-
-	// Send image packet into the graph.
-	char kInputStream[] = "image";
-    MP_RETURN_IF_ERROR(graph->AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame.release()).At(mediapipe::Timestamp(frame_timestamp_us))));
-
-    // Get the graph result packet.
-    mediapipe::Packet packet;
-    if (poller->QueueSize() == 0) {
-		return absl::UnavailableError("Could not get segmentation_mask.");
-	}
-
-	return absl::OkStatus();
-}
-
-
-absl::Status ProcessPoseTrackingTest4(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us) {
-	int number_Of_channels = 3; // SRGB format
-	int byte_depth = 1; // SRGB format
-	int width_step = width * number_Of_channels * byte_depth;
-
-	auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
-	input_frame->CopyPixelData(mediapipe::ImageFormat::SRGB, width, height, width_step, input_pixel_data, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
-
-	// Send image packet into the graph.
-	char kInputStream[] = "image";
-    MP_RETURN_IF_ERROR(graph->AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame.release()).At(mediapipe::Timestamp(frame_timestamp_us))));
-
-    // Get the graph result packet.
-    mediapipe::Packet packet;
-    if (poller->QueueSize() == 0) {
-		return absl::UnavailableError("Could not get segmentation_mask.");
-	}
-    if (!poller->Next(&packet)) {
-		return absl::UnavailableError("Could not get segmentation_mask.");
-	}
-
-	return absl::OkStatus();
-}
-
-
-CPPLIBRARY_API int process_pose_tracking_test1(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us)
-{
-	absl::Status status = ProcessPoseTrackingTest1(width, height, input_pixel_data, frame_timestamp_us);
-	return status.raw_code();
-}
-
-
-CPPLIBRARY_API int process_pose_tracking_test2(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us)
-{
-	absl::Status status = ProcessPoseTrackingTest2(width, height, input_pixel_data, frame_timestamp_us);
-	return status.raw_code();
-}
-
-
-CPPLIBRARY_API int process_pose_tracking_test3(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us)
-{
-	absl::Status status = ProcessPoseTrackingTest3(width, height, input_pixel_data, frame_timestamp_us);
-	return status.raw_code();
-}
-
-
-CPPLIBRARY_API int process_pose_tracking_test4(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us)
-{
-	absl::Status status = ProcessPoseTrackingTest4(width, height, input_pixel_data, frame_timestamp_us);
-	return status.raw_code();
+  if (status.raw_code() == 0) {
+    int landmark_size = landmarks->landmark_size()
+    if (landmark_size == size) {
+      for (int i = 0; i < landmark_size; i++) {
+        x_array[i] = landmarks->landmark(i).x();
+        y_array[i] = landmarks->landmark(i).y();
+        z_array[i] = landmarks->landmark(i).z();
+        visibilities[i] = landmarks->landmark(i).visibility();
+        presences[i] = landmarks->landmark(i).presence();
+      }
+      return 0;
+    } else {
+	    return (landmark_size + 1) * -1;
+	  }
+  } else {
+    return status.raw_code();
+  }
 }
