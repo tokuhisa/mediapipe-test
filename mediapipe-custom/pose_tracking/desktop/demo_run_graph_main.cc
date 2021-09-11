@@ -29,7 +29,7 @@
 
 constexpr char kInputStream[] = "image";
 constexpr char kOutputStreamSegmentationMask[] = "segmentation_mask";
-constexpr char kOutputThrottled[] = "throttled_input_video";
+// constexpr char kOutputThrottled[] = "throttled_input_video";
 constexpr char kWindowName[] = "MediaPipe";
 
 ABSL_FLAG(std::string, calculator_graph_config_file, "",
@@ -80,8 +80,8 @@ absl::Status RunMPPGraph() {
   LOG(INFO) << "Start running the calculator graph.";
   ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller,
                    graph.AddOutputStreamPoller(kOutputStreamSegmentationMask));
-  ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller throttled_poller,
-                   graph.AddOutputStreamPoller(kOutputThrottled));
+  // ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller throttled_poller,
+  //                  graph.AddOutputStreamPoller(kOutputThrottled));
   MP_RETURN_IF_ERROR(graph.StartRun({}));
 
   LOG(INFO) << "Start grabbing and processing frames.";
