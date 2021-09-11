@@ -12,7 +12,7 @@ std::unique_ptr<mediapipe::CalculatorGraph> graph;
 std::unique_ptr<mediapipe::OutputStreamPoller> segmentation_mask_poller;
 std::unique_ptr<mediapipe::OutputStreamPoller> landmarks_poller;
 auto segmentation_mask = absl::make_unique<mediapipe::ImageFrame>();
-auto landmarks = absl::make_unique<mediapipe::NormalizedLandmarkList>();
+// auto landmarks = absl::make_unique<mediapipe::NormalizedLandmarkList>();
 
 mediapipe::CalculatorGraphConfig build_graph_config(void) {
 	return mediapipe::ParseTextProtoOrDie<mediapipe::CalculatorGraphConfig>(R"pb(
@@ -397,7 +397,19 @@ absl::Status GetLandmarks() {
 }
 
 CPPLIBRARY_API int get_landmarks(float* x_array, float* y_array, float* z_array, float* visibilities, float* presences, int size) {
-  absl::Status status = GetLandmarks();
+  // absl::Status status = GetLandmarks();
+
+
+  // Get the graph result packet.
+  mediapipe::Packet packet;
+  if (landmarks_poller->QueueSize() == 0) {
+		return absl::UnavailableError("landmarks_poller->QueueSize() is 0").raw_code();
+	}
+  if (!landmarks_poller->Next(&packet)) {
+		return absl::UnavailableError("Could not get landmarks.").raw_code();
+	}
+	
+	auto& landmarks = packet.Get<mediapipe::NormalizedLandmarkList>();
 
   if (status.raw_code() == 0) {
     int landmark_size = landmarks->landmark_size();
