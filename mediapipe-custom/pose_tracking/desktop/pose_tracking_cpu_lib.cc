@@ -431,3 +431,14 @@ CPPLIBRARY_API int get_landmarks(float* x_array, float* y_array, float* z_array,
     return status.raw_code();
   }
 }
+
+CPPLIBRARY_API int apply_segmentation_mask(int width, int height, uint8* rgba_pixel_data, float* segmentation_mask, float threshold) {
+  for (int y = 0; y < height; y++) {
+    for (int x = 0; x < width; x++) {
+      int idx = y * width + x;
+      if (segmentation_mask[idx] <= threshold) {
+        rgba_pixel_data[idx * 4 + 3] = 0; // Alpha channel
+      }
+    }
+  }
+}
