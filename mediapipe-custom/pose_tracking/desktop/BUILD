@@ -67,6 +67,7 @@ cc_binary(
         "//mediapipe/framework:calculator_framework",
         "//mediapipe/framework/formats:image_frame",
         "//mediapipe/framework/port:parse_text_proto",
+        "//mediapipe/framework/port:file_helpers",
         "//mediapipe/framework/port:status",
         "//mediapipe/modules/pose_landmark:pose_landmark_cpu",
         "//mediapipe/calculators/core:flow_limiter_calculator",
