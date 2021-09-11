@@ -92,6 +92,8 @@ cc_binary(
         "//mediapipe/framework/port:status",
         "//mediapipe/modules/pose_landmark:pose_landmark_cpu",
         "//mediapipe/calculators/core:flow_limiter_calculator",
+        "@com_google_absl//absl/flags:flag",
+        "@com_google_absl//absl/flags:parse",
     ],
     linkshared = 1,
 )
