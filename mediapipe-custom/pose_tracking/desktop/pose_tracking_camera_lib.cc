@@ -95,18 +95,12 @@ CPPLIBRARY_API int process_pose_tracking()
   cv::Mat camera_frame_raw;
   capture >> camera_frame_raw;
   if (camera_frame_raw.empty()) {
-    if (!load_video) {
-      LOG(INFO) << "Ignore empty frames from camera.";
-      return -1;
-    }
-    LOG(INFO) << "Empty frame, end of video reached.";
-    return -2;
+    LOG(INFO) << "Ignore empty frames from camera.";
+    return -1;
   }
   cv::Mat camera_frame;
   cv::cvtColor(camera_frame_raw, camera_frame, cv::COLOR_BGR2RGB);
-  if (!load_video) {
-    cv::flip(camera_frame, camera_frame, /*flipcode=HORIZONTAL*/ 1);
-  }
+  cv::flip(camera_frame, camera_frame, /*flipcode=HORIZONTAL*/ 1);
   
 
   // Wrap Mat into an ImageFrame.
