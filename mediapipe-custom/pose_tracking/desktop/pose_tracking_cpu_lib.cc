@@ -291,7 +291,7 @@ node: {
 mediapipe::CalculatorGraphConfig build_graph_config_from_file(void) {
   
   std::string calculator_graph_config_contents;
-  MP_RETURN_IF_ERROR(mediapipe::file::GetContents(absl::GetFlag("graph.pb"), &calculator_graph_config_contents));
+  mediapipe::file::GetContents("graph.pb", &calculator_graph_config_contents);
   LOG(INFO) << "Get calculator graph config contents: " << calculator_graph_config_contents;
   return mediapipe::ParseTextProtoOrDie<mediapipe::CalculatorGraphConfig>(calculator_graph_config_contents);
 
