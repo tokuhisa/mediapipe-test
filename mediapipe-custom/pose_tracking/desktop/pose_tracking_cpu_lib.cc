@@ -400,7 +400,7 @@ CPPLIBRARY_API int get_landmarks(float* x_array, float* y_array, float* z_array,
   absl::Status status = GetLandmarks();
 
   if (status.raw_code() == 0) {
-    int landmark_size = landmarks->landmark_size()
+    int landmark_size = landmarks->landmark_size();
     if (landmark_size == size) {
       for (int i = 0; i < landmark_size; i++) {
         x_array[i] = landmarks->landmark(i).x();
