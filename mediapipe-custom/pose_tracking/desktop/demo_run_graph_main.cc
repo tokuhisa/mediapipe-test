@@ -29,6 +29,7 @@
 
 constexpr char kInputStream[] = "image";
 constexpr char kOutputStreamSegmentationMask[] = "segmentation_mask";
+constexpr char kOutputStreamLandmarks[] = "pose_world_landmarks";
 // constexpr char kOutputThrottled[] = "throttled_input_video";
 constexpr char kWindowName[] = "MediaPipe";
 
@@ -80,80 +81,86 @@ absl::Status RunMPPGraph() {
   LOG(INFO) << "Start running the calculator graph.";
   ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller poller,
                    graph.AddOutputStreamPoller(kOutputStreamSegmentationMask));
-  // ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller throttled_poller,
-  //                  graph.AddOutputStreamPoller(kOutputThrottled));
+  ASSIGN_OR_RETURN(mediapipe::OutputStreamPoller landmarks_poller,
+                   graph.AddOutputStreamPoller(kOutputStreamLandmarks));
   MP_RETURN_IF_ERROR(graph.StartRun({}));
 
   LOG(INFO) << "Start grabbing and processing frames.";
   bool grab_frames = true;
-  // /
-  // while (grab_frames) {
-  //   // Capture opencv camera or video frame.
-  //   cv::Mat camera_frame_raw;
-  //   capture >> camera_frame_raw;
-  //   if (camera_frame_raw.empty()) {
-  //     if (!load_video) {
-  //       LOG(INFO) << "Ignore empty frames from camera.";
-  //       continue;
-  //     }
-  //     LOG(INFO) << "Empty frame, end of video reached.";
-  //     break;
-  //   }
-  //   cv::Mat camera_frame;
-  //   cv::cvtColor(camera_frame_raw, camera_frame, cv::COLOR_BGR2RGB);
-  //   if (!load_video) {
-  //     cv::flip(camera_frame, camera_frame, /*flipcode=HORIZONTAL*/ 1);
-  //   }
+  while (grab_frames) {
+    // Capture opencv camera or video frame.
+    cv::Mat camera_frame_raw;
+    capture >> camera_frame_raw;
+    if (camera_frame_raw.empty()) {
+      if (!load_video) {
+        LOG(INFO) << "Ignore empty frames from camera.";
+        continue;
+      }
+      LOG(INFO) << "Empty frame, end of video reached.";
+      break;
+    }
+    cv::Mat camera_frame;
+    cv::cvtColor(camera_frame_raw, camera_frame, cv::COLOR_BGR2RGB);
+    if (!load_video) {
+      cv::flip(camera_frame, camera_frame, /*flipcode=HORIZONTAL*/ 1);
+    }
 
-  //   // Wrap Mat into an ImageFrame.
-  //   auto input_frame = absl::make_unique<mediapipe::ImageFrame>(
-  //       mediapipe::ImageFormat::SRGB, camera_frame.cols, camera_frame.rows,
-  //       mediapipe::ImageFrame::kDefaultAlignmentBoundary);
-  //   cv::Mat input_frame_mat = mediapipe::formats::MatView(input_frame.get());
-  //   camera_frame.copyTo(input_frame_mat);
+    // Wrap Mat into an ImageFrame.
+    auto input_frame = absl::make_unique<mediapipe::ImageFrame>(
+        mediapipe::ImageFormat::SRGB, camera_frame.cols, camera_frame.rows,
+        mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+    cv::Mat input_frame_mat = mediapipe::formats::MatView(input_frame.get());
+    camera_frame.copyTo(input_frame_mat);
 
     
-  //   auto input_frame2 = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, camera_frame.cols, camera_frame.rows, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
-	//   input_frame2->CopyPixelData(mediapipe::ImageFormat::SRGB, camera_frame.cols, camera_frame.rows, input_frame->PixelData(), mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+    auto input_frame2 = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, camera_frame.cols, camera_frame.rows, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+	  input_frame2->CopyPixelData(mediapipe::ImageFormat::SRGB, camera_frame.cols, camera_frame.rows, input_frame->PixelData(), mediapipe::ImageFrame::kDefaultAlignmentBoundary);
 
-  //   // Send image packet into the graph.
-  //   size_t frame_timestamp_us =
-  //       (double)cv::getTickCount() / (double)cv::getTickFrequency() * 1e6;
-  //   // MP_RETURN_IF_ERROR(graph.AddPacketToInputStream(
-  //   //     kInputStream, mediapipe::Adopt(input_frame2.release())
-  //   //                       .At(mediapipe::Timestamp(frame_timestamp_us))));
-  //   MP_RETURN_IF_ERROR(graph.AddPacketToInputStream(
-  //       kInputStream, mediapipe::Adopt(input_frame2.release())
-  //                         .At(mediapipe::Timestamp(frame_timestamp_us))));
+    // Send image packet into the graph.
+    size_t frame_timestamp_us =
+        (double)cv::getTickCount() / (double)cv::getTickFrequency() * 1e6;
+    // MP_RETURN_IF_ERROR(graph.AddPacketToInputStream(
+    //     kInputStream, mediapipe::Adopt(input_frame2.release())
+    //                       .At(mediapipe::Timestamp(frame_timestamp_us))));
+    MP_RETURN_IF_ERROR(graph.AddPacketToInputStream(
+        kInputStream, mediapipe::Adopt(input_frame2.release())
+                          .At(mediapipe::Timestamp(frame_timestamp_us))));
     
-  //   if (poller.QueueSize() == 0) continue;
+    if (poller.QueueSize() == 0) continue;
 
-  //   // Get the graph result packet, or stop if that fails.
-  //   mediapipe::Packet packet;
-  //   // if (!poller.Next(&packet)) break;
-  //   if (!poller.Next(&packet)) continue;
-  //   auto& output_frame = packet.Get<mediapipe::ImageFrame>();
+    // Get the graph result packet, or stop if that fails.
+    mediapipe::Packet packet;
+    // if (!poller.Next(&packet)) break;
+    if (!poller.Next(&packet)) continue;
+    auto& output_frame = packet.Get<mediapipe::ImageFrame>();
 
-  //   // Convert back to opencv for display or saving.
-  //   cv::Mat output_frame_mat = mediapipe::formats::MatView(&output_frame);
-  //   // cv::cvtColor(output_frame_mat, output_frame_mat, cv::COLOR_RGB2BGR);
+    // Convert back to opencv for display or saving.
+    cv::Mat output_frame_mat = mediapipe::formats::MatView(&output_frame);
+    // cv::cvtColor(output_frame_mat, output_frame_mat, cv::COLOR_RGB2BGR);
+
+    landmarks_poller
+    if (landmarks_poller.QueueSize() == 0) continue;
+    mediapipe::Packet landmarks_packet;
+    if (!landmarks_poller.Next(&landmarks_packet)) continue;
+	
+	  auto& landmarks = packet.Get<mediapipe::NormalizedLandmarkList>();
     
-  //   if (save_video) {
-  //     if (!writer.isOpened()) {
-  //       LOG(INFO) << "Prepare video writer.";
-  //       writer.open(absl::GetFlag(FLAGS_output_video_path),
-  //                   mediapipe::fourcc('a', 'v', 'c', '1'),  // .mp4
-  //                   capture.get(cv::CAP_PROP_FPS), output_frame_mat.size());
-  //       RET_CHECK(writer.isOpened());
-  //     }
-  //     writer.write(output_frame_mat);
-  //   } else {
-  //     cv::imshow(kWindowName, output_frame_mat);
-  //     // Press any key to exit.
-  //     const int pressed_key = cv::waitKey(5);
-  //     if (pressed_key >= 0 && pressed_key != 255) grab_frames = false;
-  //   }
-  // }
+    if (save_video) {
+      if (!writer.isOpened()) {
+        LOG(INFO) << "Prepare video writer.";
+        writer.open(absl::GetFlag(FLAGS_output_video_path),
+                    mediapipe::fourcc('a', 'v', 'c', '1'),  // .mp4
+                    capture.get(cv::CAP_PROP_FPS), output_frame_mat.size());
+        RET_CHECK(writer.isOpened());
+      }
+      writer.write(output_frame_mat);
+    } else {
+      cv::imshow(kWindowName, output_frame_mat);
+      // Press any key to exit.
+      const int pressed_key = cv::waitKey(5);
+      if (pressed_key >= 0 && pressed_key != 255) grab_frames = false;
+    }
+  }
 
   LOG(INFO) << "Shutting down.";
   if (writer.isOpened()) writer.release();
