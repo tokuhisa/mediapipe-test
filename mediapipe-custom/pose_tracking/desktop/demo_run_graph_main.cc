@@ -111,11 +111,18 @@ absl::Status RunMPPGraph() {
     cv::Mat input_frame_mat = mediapipe::formats::MatView(input_frame.get());
     camera_frame.copyTo(input_frame_mat);
 
+    
+    auto input_frame2 = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, camera_frame.cols, camera_frame.rows, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+	  input_frame2->CopyPixelData(mediapipe::ImageFormat::SRGB, camera_frame.cols, camera_frame.rows, camera_frame.cols * 3, input_frame->PixelData(), mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+
     // Send image packet into the graph.
     size_t frame_timestamp_us =
         (double)cv::getTickCount() / (double)cv::getTickFrequency() * 1e6;
+    // MP_RETURN_IF_ERROR(graph.AddPacketToInputStream(
+    //     kInputStream, mediapipe::Adopt(input_frame2.release())
+    //                       .At(mediapipe::Timestamp(frame_timestamp_us))));
     MP_RETURN_IF_ERROR(graph.AddPacketToInputStream(
-        kInputStream, mediapipe::Adopt(input_frame.release())
+        kInputStream, mediapipe::Adopt(input_frame2.release())
                           .At(mediapipe::Timestamp(frame_timestamp_us))));
     
     if (poller.QueueSize() == 0) continue;
