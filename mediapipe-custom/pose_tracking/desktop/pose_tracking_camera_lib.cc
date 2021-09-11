@@ -115,7 +115,7 @@ CPPLIBRARY_API int process_pose_tracking()
   camera_frame.copyTo(input_frame_mat);
   
   size_t frame_timestamp_us = (double)cv::getTickCount() / (double)cv::getTickFrequency() * 1e6;
-	absl::Status status = ProcessPoseTracking(camera_frame.cols, camera_frame.rows, input_frame->PixelData(), frame_timestamp_us);
+	absl::Status status = ProcessPoseTracking(camera_frame.cols, camera_frame.rows, input_frame->MutablePixelData(), frame_timestamp_us);
 	return status.raw_code();
 }
 
