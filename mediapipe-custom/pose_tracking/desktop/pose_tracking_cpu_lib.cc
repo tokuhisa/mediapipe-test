@@ -328,9 +328,6 @@ CPPLIBRARY_API int init_pose_tracking(void)
 }
 
 absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us) {
-	int number_Of_channels = 3; // SRGB format
-	int byte_depth = 1; // SRGB format
-	int width_step = width * number_Of_channels * byte_depth;
 	
   auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGB, width, height, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
 	input_frame->CopyPixelData(mediapipe::ImageFormat::SRGB, width, height, input_pixel_data, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
@@ -342,10 +339,27 @@ absl::Status ProcessPoseTracking(int width, int height, uint8* input_pixel_data,
 	return absl::OkStatus();
 }
 
-CPPLIBRARY_API int process_pose_tracking(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us)
+absl::Status ProcessPoseTrackingSRGBA(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us) {
+	
+  auto input_frame = absl::make_unique<mediapipe::ImageFrame>(mediapipe::ImageFormat::SRGBA, width, height, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+	input_frame->CopyPixelData(mediapipe::ImageFormat::SRGBA, width, height, input_pixel_data, mediapipe::ImageFrame::kDefaultAlignmentBoundary);
+
+	// Send image packet into the graph.
+	char kInputStream[] = "image";
+  MP_RETURN_IF_ERROR(graph->AddPacketToInputStream(kInputStream, mediapipe::Adopt(input_frame.release()).At(mediapipe::Timestamp(frame_timestamp_us))));
+
+	return absl::OkStatus();
+}
+
+CPPLIBRARY_API int process_pose_tracking(int width, int height, uint8* input_pixel_data, int64 frame_timestamp_us, int rgba)
 {
-	absl::Status status = ProcessPoseTracking(width, height, input_pixel_data, frame_timestamp_us);
-	return status.raw_code();
+  if (rgba == 1) {
+	  absl::Status status = ProcessPoseTrackingSRGBA(width, height, input_pixel_data, frame_timestamp_us);
+	  return status.raw_code();
+  } else {
+	  absl::Status status = ProcessPoseTracking(width, height, input_pixel_data, frame_timestamp_us);
+	  return status.raw_code();
+  }
 }
 
 absl::Status GetSegmentationMask() {
