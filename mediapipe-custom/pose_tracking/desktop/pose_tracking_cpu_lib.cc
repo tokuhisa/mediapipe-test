@@ -441,4 +441,5 @@ CPPLIBRARY_API int apply_segmentation_mask(int width, int height, uint8* rgba_pi
       }
     }
   }
+  return 0;
 }
