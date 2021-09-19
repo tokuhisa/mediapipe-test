@@ -11,8 +11,11 @@
 std::unique_ptr<mediapipe::CalculatorGraph> graph;
 std::unique_ptr<mediapipe::OutputStreamPoller> segmentation_mask_poller;
 std::unique_ptr<mediapipe::OutputStreamPoller> landmarks_poller;
+std::unique_ptr<mediapipe::OutputStreamPoller> pose_landmarks_poller;
+
 auto segmentation_mask = absl::make_unique<mediapipe::ImageFrame>();
 auto landmarks = absl::make_unique<mediapipe::LandmarkList>();
+auto pose_landmarks = absl::make_unique<mediapipe::LandmarkList>();
 
 mediapipe::CalculatorGraphConfig build_graph_config(void) {
 	return mediapipe::ParseTextProtoOrDie<mediapipe::CalculatorGraphConfig>(R"pb(
@@ -316,6 +319,10 @@ absl::Status InitPoseTracking() {
 	auto landmarks_sop = graph->AddOutputStreamPoller(kOutputStreamLandmarks);
 	landmarks_poller = absl::make_unique<mediapipe::OutputStreamPoller>(std::move(landmarks_sop.value()));
 
+  char kOutputStreamPoseLandmarks[] = "pose_landmarks";
+	auto pose_landmarks_sop = graph->AddOutputStreamPoller(kOutputStreamPoseLandmarks);
+	pose_landmarks_poller = absl::make_unique<mediapipe::OutputStreamPoller>(std::move(pose_landmarks_sop.value()));
+
 	MP_RETURN_IF_ERROR(graph->StartRun({}));
 	
 	return absl::OkStatus();
@@ -431,6 +438,45 @@ CPPLIBRARY_API int get_landmarks(float* x_array, float* y_array, float* z_array,
     return status.raw_code();
   }
 }
+
+absl::Status GetPoseLandmarks() {
+  // Get the graph result packet.
+  mediapipe::Packet packet;
+  if (pose_landmarks_poller->QueueSize() == 0) {
+		return absl::UnavailableError("pose_landmarks_poller->QueueSize() is 0");
+	}
+  if (!pose_landmarks_poller->Next(&packet)) {
+		return absl::UnavailableError("Could not get pose landmarks.");
+	}
+	
+	auto& landmark_list = packet.Get<mediapipe::LandmarkList>();
+  pose_landmarks = absl::make_unique<mediapipe::LandmarkList>(landmark_list);
+
+	return absl::OkStatus();
+}
+
+CPPLIBRARY_API int get_pose_landmarks(float* x_array, float* y_array, float* z_array, float* visibilities, float* presences, int size) {
+  absl::Status status = GetPoseLandmarks();
+
+  if (status.raw_code() == 0) {
+    int landmark_size = pose_landmarks->landmark_size();
+    if (landmark_size == size) {
+      for (int i = 0; i < landmark_size; i++) {
+        x_array[i] = pose_landmarks->landmark(i).x();
+        y_array[i] = pose_landmarks->landmark(i).y();
+        z_array[i] = pose_landmarks->landmark(i).z();
+        visibilities[i] = pose_landmarks->landmark(i).visibility();
+        presences[i] = pose_landmarks->landmark(i).presence();
+      }
+      return 0;
+    } else {
+	    return (landmark_size + 1) * -1;
+	  }
+  } else {
+    return status.raw_code();
+  }
+}
+
 
 CPPLIBRARY_API int apply_segmentation_mask(int width, int height, uint8* rgba_pixel_data, float* segmentation_mask, float threshold) {
   for (int y = 0; y < height; y++) {

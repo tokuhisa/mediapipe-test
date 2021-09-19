@@ -12,4 +12,5 @@ extern "C"
 	CPPLIBRARY_API int get_segmentation_mask(int width, int height, float* output_segmentation_mask);
 	CPPLIBRARY_API int apply_segmentation_mask(int width, int height, uint8* rgba_pixel_data, float* segmentation_mask, float threshold);
 	CPPLIBRARY_API int get_landmarks(float* x_array, float* y_array, float* z_array, float* visibilities, float* presences, int size);
+    CPPLIBRARY_API int get_pose_landmarks(float* x_array, float* y_array, float* z_array, float* visibilities, float* presences, int size);
 }
