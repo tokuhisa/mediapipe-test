@@ -15,7 +15,7 @@ std::unique_ptr<mediapipe::OutputStreamPoller> pose_landmarks_poller;
 
 auto segmentation_mask = absl::make_unique<mediapipe::ImageFrame>();
 auto landmarks = absl::make_unique<mediapipe::LandmarkList>();
-auto pose_landmarks = absl::make_unique<mediapipe::LandmarkList>();
+auto pose_landmarks = absl::make_unique<mediapipe::NormalizedLandmarkList>();
 
 mediapipe::CalculatorGraphConfig build_graph_config(void) {
 	return mediapipe::ParseTextProtoOrDie<mediapipe::CalculatorGraphConfig>(R"pb(
@@ -449,8 +449,8 @@ absl::Status GetPoseLandmarks() {
 		return absl::UnavailableError("Could not get pose landmarks.");
 	}
 	
-	auto& landmark_list = packet.Get<mediapipe::LandmarkList>();
-  pose_landmarks = absl::make_unique<mediapipe::LandmarkList>(landmark_list);
+	auto& landmark_list = packet.Get<mediapipe::NormalizedLandmarkList>();
+  pose_landmarks = absl::make_unique<mediapipe::NormalizedLandmarkList>(landmark_list);
 
 	return absl::OkStatus();
 }
