@@ -20,7 +20,9 @@ extern "C"
 	CPPLIBRARY_API int get_landmarks(float* x_array, float* y_array, float* z_array, float* visibilities, float* presences, int size);
     CPPLIBRARY_API int get_pose_landmarks(float* x_array, float* y_array, float* z_array, float* visibilities, float* presences, int size);
 	
-    typedef bool ResourceProvider(const char* path, std::string* output);
-
+    // typedef bool ResourceProvider(const char* path, std::string* output);
+    typedef int ResourceProvider(const char* path);
+    CPPLIBRARY_API void put_resource_data(int resource_id, uint8* data, int data_size);
+    CPPLIBRARY_API void remove_resource_data(int resource_id);
     CPPLIBRARY_API void set_custom_global_resource_provider(ResourceProvider* resource_provider);
 }

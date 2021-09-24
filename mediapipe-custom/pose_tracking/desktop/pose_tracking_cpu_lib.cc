@@ -16,6 +16,7 @@ std::unique_ptr<mediapipe::OutputStreamPoller> pose_landmarks_poller;
 auto segmentation_mask = absl::make_unique<mediapipe::ImageFrame>();
 auto landmarks = absl::make_unique<mediapipe::LandmarkList>();
 auto pose_landmarks = absl::make_unique<mediapipe::NormalizedLandmarkList>();
+std::map<int, std::string> resources;
 
 mediapipe::CalculatorGraphConfig build_graph_config(void) {
 	return mediapipe::ParseTextProtoOrDie<mediapipe::CalculatorGraphConfig>(R"pb(
@@ -490,11 +491,29 @@ CPPLIBRARY_API int apply_segmentation_mask(int width, int height, uint8* rgba_pi
   return 0;
 }
 
+CPPLIBRARY_API void put_resource_data(int resource_id, uint8* data, int data_size) {
+  resources[resource_id] = std::string (data, data_size);
+}
+CPPLIBRARY_API void remove_resource_data(int resource_id) {
+  auto itr = resources.find(resource_id);
+  if( itr != resources.end() ) {
+    resources.erase(itr);
+  }
+}
+
 CPPLIBRARY_API void set_custom_global_resource_provider(ResourceProvider* resource_provider) {
   mediapipe::SetCustomGlobalResourceProvider([resource_provider](const std::string& path, std::string* output) -> ::absl::Status {
-    if (resource_provider(path.c_str(), output)) {
+    int resource_id = resource_provider(path.c_str());
+    auto itr = resources.find(resource_id);
+    if( itr != resources.end() ) {
+      auto data = itr->second;
+      auto src = std::string(data);
+      src.swap(*output);
       return absl::OkStatus();
     }
+    // if (resource_provider(path.c_str(), output)) {
+    //   return absl::OkStatus();
+    // }
     return absl::FailedPreconditionError(absl::StrCat("Failed to read ", path));
   });
 }
