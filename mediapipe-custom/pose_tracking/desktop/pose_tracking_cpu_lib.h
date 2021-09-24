@@ -4,7 +4,10 @@
 
 #include <cstdlib>
 #include "mediapipe/framework/deps/safe_int.h"
-#include "resource_util_custom.h"
+#include <csetjmp>
+#include <csignal>
+#include <string>
+#include "mediapipe/util/resource_util_custom.h"
 #include "absl/strings/str_cat.h"
 #include "mediapipe/framework/deps/ret_check.h"
 
