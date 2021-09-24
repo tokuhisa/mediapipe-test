@@ -489,3 +489,12 @@ CPPLIBRARY_API int apply_segmentation_mask(int width, int height, uint8* rgba_pi
   }
   return 0;
 }
+
+CPPLIBRARY_API void set_custom_global_resource_provider(ResourceProvider* resource_provider) {
+  mediapipe::SetCustomGlobalResourceProvider([resource_provider](const std::string& path, std::string* output) -> ::absl::Status {
+    if (resource_provider(path.c_str(), output)) {
+      return absl::OkStatus();
+    }
+    return absl::FailedPreconditionError(absl::StrCat("Failed to read ", path));
+  });
+}
