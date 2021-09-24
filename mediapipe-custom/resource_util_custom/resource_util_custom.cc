@@ -10,13 +10,3 @@ CPPLIBRARY_API void set_custom_global_resource_provider(ResourceProvider* resour
     return absl::FailedPreconditionError(absl::StrCat("Failed to read ", path));
   });
 }
-
-
-CPPLIBRARY_API void set_custom_global_path_resolver(PathResolver* path_resolver) {
-  mediapipe::SetCustomGlobalPathResolver([path_resolver](const std::string& path) -> ::absl::StatusOr<std::string> {
-    auto resolved_path = path_resolver(path.c_str());
-
-    RET_CHECK_NE(resolved_path, nullptr);
-    return std::string(resolved_path);
-  });
-}
