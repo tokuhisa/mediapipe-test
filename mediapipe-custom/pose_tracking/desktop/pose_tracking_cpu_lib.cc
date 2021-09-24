@@ -491,7 +491,7 @@ CPPLIBRARY_API int apply_segmentation_mask(int width, int height, uint8* rgba_pi
   return 0;
 }
 
-CPPLIBRARY_API void put_resource_data(int resource_id, uint8* data, int data_size) {
+CPPLIBRARY_API void put_resource_data(int resource_id, char* data, int data_size) {
   resources[resource_id] = std::string (data, data_size);
 }
 CPPLIBRARY_API void remove_resource_data(int resource_id) {

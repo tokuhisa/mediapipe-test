@@ -22,7 +22,7 @@ extern "C"
 	
     // typedef bool ResourceProvider(const char* path, std::string* output);
     typedef int ResourceProvider(const char* path);
-    CPPLIBRARY_API void put_resource_data(int resource_id, uint8* data, int data_size);
+    CPPLIBRARY_API void put_resource_data(int resource_id, char* data, int data_size);
     CPPLIBRARY_API void remove_resource_data(int resource_id);
     CPPLIBRARY_API void set_custom_global_resource_provider(ResourceProvider* resource_provider);
 }
