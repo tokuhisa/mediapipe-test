@@ -74,7 +74,6 @@ cc_binary(
         "@com_google_absl//absl/strings",
         "//mediapipe/framework/port:ret_check",
         "//mediapipe/util:resource_util",
-        "//mediapipe/framework/port:disable_opencv",
     ],
     linkshared = 1,
 )
