@@ -15,15 +15,15 @@ extern "C"
 
   CPPLIBRARY_API int WriteRGBAImageFrame(int input_id, int width, int height, uint8* data, int64 frame_timestamp_us);
   CPPLIBRARY_API int ReadVEC32F1ImageFrame(int output_id, int width, int height, float* image_data);
-  CPPLIBRARY_API int ReadLandmarkList(int output_id, int landmark_count, float* landmark_data);
-  CPPLIBRARY_API int ReadNormalizedLandmarkList(int output_id, int landmark_count, float* landmark_data);
+  CPPLIBRARY_API int ReadLandmarkList(int output_id, int landmark_size, float* landmark_data);
+  CPPLIBRARY_API int ReadNormalizedLandmarkList(int output_id, int landmark_size, float* landmark_data);
 
   CPPLIBRARY_API int CloseInputStream(int input_id);
   CPPLIBRARY_API int CloseOutputStream(int output_id);
   CPPLIBRARY_API int TerminateGraph(int graph_id);
 
   // Util
-  CPPLIBRARY_API int ApplyImageMask(int width, int height, uint8* data, float* mask, float threshold, unit8 fg_alpha, uint8 bg_alpha); 
+  CPPLIBRARY_API int ApplyImageMask(int width, int height, uint8* data, float* mask, float threshold, uint8 fg_alpha, uint8 bg_alpha); 
 
   // Resource Provider
   typedef bool ResourceProvider(const char* path, std::string* output);

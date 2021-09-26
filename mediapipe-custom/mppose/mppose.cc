@@ -81,7 +81,7 @@ absl::Status ReadVEC32F1ImageFrameMp(int output_id, int width, int height, float
   auto& output_frame = packet.Get<mediapipe::ImageFrame>();
   int data_size = width * height; // VEC32F1
   if (output_frame.Width() == width && output_frame.Height() == height) {
-    output_frame.CopyToBuffer(data, segmentation_mask_size);
+    output_frame.CopyToBuffer(image_data, data_size);
     return absl::OkStatus();
   } else {
     return absl::UnavailableError("Unavailable data size.");
@@ -148,7 +148,7 @@ absl::Status ReadNormalizedLandmarkListMp(int output_id, int landmark_size, floa
   }
 }
 
-CPPLIBRARY_API int ReadNormalizedLandmarkList(int output_id, int landmark_count, float* landmark_data) {
+CPPLIBRARY_API int ReadNormalizedLandmarkList(int output_id, int landmark_size, float* landmark_data) {
   auto status = ReadNormalizedLandmarkListMp(output_id, landmark_size, landmark_data);
   return status.raw_code();
 }
@@ -195,7 +195,7 @@ CPPLIBRARY_API int TerminateGraph(int graph_id) {
 }
 
 // Util
-CPPLIBRARY_API int ApplyImageMask(int width, int height, uint8* data, float* mask, float threshold, unit8 fg_alpha, uint8 bg_alpha) {
+CPPLIBRARY_API int ApplyImageMask(int width, int height, uint8* data, float* mask, float threshold, uint8 fg_alpha, uint8 bg_alpha) {
   for (int y = 0; y < height; y++) {
     for (int x = 0; x < width; x++) {
       int idx = y * width + x;
