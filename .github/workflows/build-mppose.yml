@@ -1,0 +1,40 @@
+name: Build mppose
+
+on: [ workflow_dispatch ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Initialize
+      uses: actions/checkout@v2
+      with:
+        submodules: true
+
+    - name: Cache Bazel
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/bazel
+        key: ${{ runner.os }}-${{ hashFiles('WORKSPACE') }}
+
+    - name: Build binary
+      run: |
+        pip install numpy
+        Invoke-WebRequest https://github.com/opencv/opencv/releases/download/3.4.10/opencv-3.4.10-vc14_vc15.exe -OutFile opencv.exe
+        .\opencv.exe -o"C:" -y
+        xcopy /e /i mediapipe-custom mediapipe\mediapipe-custom
+        # cd mediapipe && bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe-custom/mppose:mppose
+        cd mediapipe && bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe-custom/mppose:mppose
+    
+    - name: The job has succeeded
+      if: ${{ success() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: custom-pose
+        path: mediapipe/bazel-bin/mediapipe-custom/mppose
+        
+    # - name: Setup tmate session
+    #   if: ${{ failure() }}
+    #   uses: mxschmitt/action-tmate@v3
+    #   timeout-minutes: 30
