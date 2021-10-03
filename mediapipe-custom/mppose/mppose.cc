@@ -153,6 +153,41 @@ CPPLIBRARY_API int ReadNormalizedLandmarkList(int output_id, int landmark_size, 
   return status.raw_code();
 }
 
+absl::Status ReadNormalizedLandmarksCollectionMp(int output_id, int collection_size, int landmark_size, float* landmark_data, int* total_collection_size) {
+  // Get the graph result packet.
+  mediapipe::Packet packet;
+  if (output_streams[output_id]->QueueSize() == 0) {
+    return absl::UnavailableError("poller->QueueSize() is 0.");
+  }
+  if (!output_streams[output_id]->Next(&packet)) {
+    return absl::UnavailableError("Could not get packet.");
+  }
+
+  auto& landmarks_collection = packet.Get<std::vector<mediapipe::NormalizedLandmarkList>>();
+  auto total_size = landmarks_collection.size();
+  *total_collection_size = total_size;
+  auto size = collection_size > total_size ? total_size : collection_size;
+  for (int idx = 0; idx < size; idx++) {
+    auto landmark_list = landmarks_collection[idx];
+    if (landmark_list.landmark_size() != landmark_size) {
+      return absl::UnavailableError("Unavailable data size.");
+    }
+    for (int i = 0; i < landmark_size; i++) {
+      landmark_data[idx * landmark_size * 5 + i * 5] = landmark_list.landmark(i).x();
+      landmark_data[idx * landmark_size * 5 + i * 5 + 1] = landmark_list.landmark(i).y();
+      landmark_data[idx * landmark_size * 5 + i * 5 + 2] = landmark_list.landmark(i).z();
+      landmark_data[idx * landmark_size * 5 + i * 5 + 3] = landmark_list.landmark(i).visibility();
+      landmark_data[idx * landmark_size * 5 + i * 5 + 4] = landmark_list.landmark(i).presence();
+    }
+  }
+  return absl::OkStatus();
+}
+
+CPPLIBRARY_API int ReadNormalizedLandmarksCollection(int output_id, int collection_size, int landmark_size, float* landmark_data, int* total_collection_size) {
+  auto status = ReadNormalizedLandmarksCollectionMp(output_id, collection_size, landmark_size, landmark_data, total_collection_size);
+  return status.raw_code();
+}
+
 absl::Status CloseInputStreamMp(int input_id) {
   auto graph_id = input_graph_ids[input_id];
   auto input_name = input_names[input_id];

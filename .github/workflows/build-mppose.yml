@@ -31,7 +31,7 @@ jobs:
       if: ${{ success() }}
       uses: actions/upload-artifact@v2
       with:
-        name: custom-pose
+        name: mppose
         path: mediapipe/bazel-bin/mediapipe-custom/mppose
         
     # - name: Setup tmate session

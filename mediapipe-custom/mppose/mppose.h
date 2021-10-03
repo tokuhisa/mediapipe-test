@@ -17,6 +17,7 @@ extern "C"
   CPPLIBRARY_API int ReadVEC32F1ImageFrame(int output_id, int width, int height, float* image_data);
   CPPLIBRARY_API int ReadLandmarkList(int output_id, int landmark_size, float* landmark_data);
   CPPLIBRARY_API int ReadNormalizedLandmarkList(int output_id, int landmark_size, float* landmark_data);
+  CPPLIBRARY_API int ReadNormalizedLandmarksCollection(int output_id, int collection_size, int landmark_size, float* landmark_data, int* total_collection_size);
 
   CPPLIBRARY_API int CloseInputStream(int input_id);
   CPPLIBRARY_API int CloseOutputStream(int output_id);
