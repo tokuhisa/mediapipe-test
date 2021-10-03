@@ -14,6 +14,7 @@ cc_binary(
         "//mediapipe/framework/port:status",
         "//mediapipe/modules/pose_landmark:pose_landmark_cpu",
         "//mediapipe/modules/hand_landmark:hand_landmark_tracking_cpu",
+        "//mediapipe/modules/face_landmark:face_landmark_front_cpu",
         "@com_google_absl//absl/strings",
     ],
     linkshared = 1,

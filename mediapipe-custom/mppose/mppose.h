@@ -18,7 +18,7 @@ extern "C"
   CPPLIBRARY_API int ReadLandmarkList(int output_id, int landmark_size, float* landmark_data);
   CPPLIBRARY_API int ReadNormalizedLandmarkList(int output_id, int landmark_size, float* landmark_data);
   CPPLIBRARY_API int ReadNormalizedLandmarkListCollection(int output_id, int collection_size, int landmark_size, float* landmark_data, int* num_of_detections);
-  CPPLIBRARY_API int ReadClassificationListCollection(int output_id, int collection_size, int classification_list_size, int* index_data, float* score_data, int* num_of_detections);
+  CPPLIBRARY_API int ReadClassificationListCollection(int output_id, int collection_size, int classification_list_size, int32* index_data, float* score_data, int* num_of_detections);
 
   CPPLIBRARY_API int CloseInputStream(int input_id);
   CPPLIBRARY_API int CloseOutputStream(int output_id);

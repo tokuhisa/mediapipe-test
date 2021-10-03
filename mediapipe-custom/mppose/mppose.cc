@@ -189,7 +189,7 @@ CPPLIBRARY_API int ReadNormalizedLandmarkListCollection(int output_id, int colle
   return status.raw_code();
 }
 
-absl::Status ReadClassificationListCollectionMp(int output_id, int collection_size, int classification_list_size, int* index_data, float* score_data, int* num_of_detections) {
+absl::Status ReadClassificationListCollectionMp(int output_id, int collection_size, int classification_list_size, int32* index_data, float* score_data, int* num_of_detections) {
   // Get the graph result packet.
   mediapipe::Packet packet;
   if (output_streams[output_id]->QueueSize() == 0) {
@@ -216,7 +216,7 @@ absl::Status ReadClassificationListCollectionMp(int output_id, int collection_si
   return absl::OkStatus();
 }
 
-CPPLIBRARY_API int ReadClassificationListCollection(int output_id, int collection_size, int classification_list_size, int* index_data, float* score_data, int* num_of_detections) {
+CPPLIBRARY_API int ReadClassificationListCollection(int output_id, int collection_size, int classification_list_size, int32* index_data, float* score_data, int* num_of_detections) {
   auto status = ReadClassificationListCollectionMp(output_id, collection_size, classification_list_size, index_data, score_data, num_of_detections);
   return status.raw_code();
 }
