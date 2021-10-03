@@ -6,6 +6,7 @@
 #include "mediapipe/framework/formats/image_frame.h"
 #include "mediapipe/framework/port/parse_text_proto.h"
 #include "mediapipe/framework/port/status.h"
+#include "mediapipe/framework/formats/classification.pb.h"
 #include "mediapipe/framework/formats/landmark.pb.h"
 
 std::map<int, std::unique_ptr<mediapipe::CalculatorGraph>> graph_data; // key=graph_id
@@ -153,7 +154,7 @@ CPPLIBRARY_API int ReadNormalizedLandmarkList(int output_id, int landmark_size, 
   return status.raw_code();
 }
 
-absl::Status ReadNormalizedLandmarksCollectionMp(int output_id, int collection_size, int landmark_size, float* landmark_data, int* total_collection_size) {
+absl::Status ReadNormalizedLandmarkListCollectionMp(int output_id, int collection_size, int landmark_size, float* landmark_data, int* num_of_detections) {
   // Get the graph result packet.
   mediapipe::Packet packet;
   if (output_streams[output_id]->QueueSize() == 0) {
@@ -165,7 +166,7 @@ absl::Status ReadNormalizedLandmarksCollectionMp(int output_id, int collection_s
 
   auto& landmarks_collection = packet.Get<std::vector<mediapipe::NormalizedLandmarkList>>();
   auto total_size = landmarks_collection.size();
-  *total_collection_size = total_size;
+  *num_of_detections = total_size;
   auto size = collection_size > total_size ? total_size : collection_size;
   for (int idx = 0; idx < size; idx++) {
     auto landmark_list = landmarks_collection[idx];
@@ -183,8 +184,40 @@ absl::Status ReadNormalizedLandmarksCollectionMp(int output_id, int collection_s
   return absl::OkStatus();
 }
 
-CPPLIBRARY_API int ReadNormalizedLandmarksCollection(int output_id, int collection_size, int landmark_size, float* landmark_data, int* total_collection_size) {
-  auto status = ReadNormalizedLandmarksCollectionMp(output_id, collection_size, landmark_size, landmark_data, total_collection_size);
+CPPLIBRARY_API int ReadNormalizedLandmarkListCollection(int output_id, int collection_size, int landmark_size, float* landmark_data, int* num_of_detections) {
+  auto status = ReadNormalizedLandmarkListCollectionMp(output_id, collection_size, landmark_size, landmark_data, num_of_detections);
+  return status.raw_code();
+}
+
+absl::Status ReadClassificationListCollectionMp(int output_id, int collection_size, int classification_list_size, int* index_data, float* score_data, int* num_of_detections) {
+  // Get the graph result packet.
+  mediapipe::Packet packet;
+  if (output_streams[output_id]->QueueSize() == 0) {
+    return absl::UnavailableError("poller->QueueSize() is 0.");
+  }
+  if (!output_streams[output_id]->Next(&packet)) {
+    return absl::UnavailableError("Could not get packet.");
+  }
+
+  auto& classifications_collection = packet.Get<std::vector<mediapipe::ClassificationList>>();
+  auto total_size = classifications_collection.size();
+  *num_of_detections = total_size;
+  auto size = collection_size > total_size ? total_size : collection_size;
+  for (int idx = 0; idx < size; idx++) {
+    auto classification_list = classifications_collection[idx];
+    if (classification_list.classification_size() != classification_list_size) {
+      return absl::UnavailableError("Unavailable data size.");
+    }
+    for (int i = 0; i < classification_list_size; i++) {
+      index_data[idx * classification_list_size + i] = classification_list_size.classification(i).index();
+      score_data[idx * classification_list_size + i] = classification_list_size.classification(i).score();
+    }
+  }
+  return absl::OkStatus();
+}
+
+CPPLIBRARY_API int ReadClassificationListCollection(int output_id, int collection_size, int classification_list_size, int* index_data, float* score_data, int* num_of_detections) {
+  auto status = ReadClassificationListCollectionMp(output_id, collection_size, classification_list_size, index_data, score_data, num_of_detections);
   return status.raw_code();
 }
 
