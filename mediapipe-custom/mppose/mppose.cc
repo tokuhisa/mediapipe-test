@@ -209,8 +209,8 @@ absl::Status ReadClassificationListCollectionMp(int output_id, int collection_si
       return absl::UnavailableError("Unavailable data size.");
     }
     for (int i = 0; i < classification_list_size; i++) {
-      index_data[idx * classification_list_size + i] = classification_list_size.classification(i).index();
-      score_data[idx * classification_list_size + i] = classification_list_size.classification(i).score();
+      index_data[idx * classification_list_size + i] = classification_list.classification(i).index();
+      score_data[idx * classification_list_size + i] = classification_list.classification(i).score();
     }
   }
   return absl::OkStatus();
