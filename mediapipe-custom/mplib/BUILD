@@ -1,9 +1,9 @@
 package(default_visibility = ["//mediapipe/examples:__subpackages__"])
 
 cc_binary(
-    name = "mppose",
-    srcs = ["mppose.cc",
-            "mppose.h"],
+    name = "mplib",
+    srcs = ["mplib.cc",
+            "mplib.h"],
     deps = [
         "//mediapipe/util:resource_util",
         "//mediapipe/calculators/core:flow_limiter_calculator",

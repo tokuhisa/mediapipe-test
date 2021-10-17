@@ -1,4 +1,4 @@
-name: Build mppose
+name: Build MPLIB
 
 on: [ workflow_dispatch ]
 
@@ -24,15 +24,14 @@ jobs:
         Invoke-WebRequest https://github.com/opencv/opencv/releases/download/3.4.10/opencv-3.4.10-vc14_vc15.exe -OutFile opencv.exe
         .\opencv.exe -o"C:" -y
         xcopy /e /i mediapipe-custom mediapipe\mediapipe-custom
-        # cd mediapipe && bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe-custom/mppose:mppose
-        cd mediapipe && bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe-custom/mppose:mppose
+        cd mediapipe && bazel build -c opt --define MEDIAPIPE_DISABLE_GPU=1 mediapipe-custom/mplib:mplib
     
     - name: The job has succeeded
       if: ${{ success() }}
       uses: actions/upload-artifact@v2
       with:
-        name: mppose
-        path: mediapipe/bazel-bin/mediapipe-custom/mppose
+        name: mplib
+        path: mediapipe/bazel-bin/mediapipe-custom/mplib
         
     # - name: Setup tmate session
     #   if: ${{ failure() }}
