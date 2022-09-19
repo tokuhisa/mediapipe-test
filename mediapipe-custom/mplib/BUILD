@@ -18,5 +18,6 @@ cc_binary(
         "//mediapipe/modules/holistic_landmark:holistic_landmark_cpu",
         "@com_google_absl//absl/strings",
     ],
-    linkshared = 1,
+    linkshared = 0,
+    linkstatic = 1,
 )
