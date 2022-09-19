@@ -4,13 +4,20 @@ on: [ workflow_dispatch ]
 
 jobs:
   build:
-    runs-on: windows-2019
+    runs-on: windows-latest
 
     steps:
     - name: Initialize
       uses: actions/checkout@v2
       with:
         submodules: true
+    
+    - name: Setup bazel
+      uses: jwlawson/actions-setup-bazel@v1
+      with:
+        bazel-version: '4.2.1'
+    - name: Use bazel
+      run: bazel --version
 
     - name: Cache Bazel
       uses: actions/cache@v2
