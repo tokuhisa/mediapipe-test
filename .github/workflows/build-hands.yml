@@ -12,6 +12,10 @@ jobs:
       with:
         submodules: true
 
+    - name: Git clone
+      run: |
+        git clone --depth 1 https://github.com/google/mediapipe.git
+
     - name: Cache Bazel
       uses: actions/cache@v2
       with:
