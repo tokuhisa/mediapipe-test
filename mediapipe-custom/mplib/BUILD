@@ -1,10 +1,22 @@
 package(default_visibility = ["//mediapipe/examples:__subpackages__"])
 
 cc_binary(
+    target_compatible_with = [
+        "@platforms//os:windows",
+    ],
+    name = "mplib.dll",
+    deps = [":mplib"],
+    linkshared = 1,
+)
+
+cc_library(
+    target_compatible_with = [
+        "@platforms//os:windows",
+    ],
     name = "mplib",
-    srcs = ["mplib.cc",
-            "mplib.h"],
-    copts = ["-DPROTOBUF_USE_DLLS", "-DPROTOBUF_C_EXPORT"],
+    srcs = ["mplib.cc"],
+    hdrs = ["mplib.h"],
+    visibility = ["//visibility:public"],
     deps = [
         "//mediapipe/util:resource_util",
         "//mediapipe/calculators/core:flow_limiter_calculator",
@@ -19,6 +31,6 @@ cc_binary(
         "//mediapipe/modules/holistic_landmark:holistic_landmark_cpu",
         "@com_google_absl//absl/strings",
     ],
-    linkstatic = False,
-    linkshared = True,
+    defines = ["COMPILING_DLL=1"],
+    alwayslink = 1,
 )
