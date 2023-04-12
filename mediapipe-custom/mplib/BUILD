@@ -1,12 +1,10 @@
 package(default_visibility = ["//mediapipe/examples:__subpackages__"])
 
-cc_library(
+cc_binary(
     name = "mplib",
-    srcs = ["mplib.cc"],
-    hdrs = ["mplib.h"],
-    visibility = ["//visibility:public"],
-    copts = ["/MD", "/LD"],
-    linkopts = ["/DLL"],
+    srcs = ["mplib.cc",
+            "mplib.h"],
+    copts = ["-DPROTOBUF_USE_DLLS", "-DPROTOBUF_C_EXPORT"],
     deps = [
         "//mediapipe/util:resource_util",
         "//mediapipe/calculators/core:flow_limiter_calculator",
@@ -21,4 +19,6 @@ cc_library(
         "//mediapipe/modules/holistic_landmark:holistic_landmark_cpu",
         "@com_google_absl//absl/strings",
     ],
+    linkstatic = False,
+    linkshared = True,
 )
