@@ -4,13 +4,17 @@ on: [ workflow_dispatch ]
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2019
 
     steps:
     - name: Initialize
       uses: actions/checkout@v2
       with:
         submodules: true
+
+    - name: Git clone
+      run: |
+        git clone --depth 1 https://github.com/google/mediapipe.git
 
     - name: Cache Bazel
       uses: actions/cache@v2
