@@ -21,7 +21,7 @@ package(default_visibility = ["//mediapipe/examples:__subpackages__"])
 //     linkstatic = 0,
 // )
 
-cc_library(
+cc_binary(
     name = "mplib",
     srcs = ["mplib.cc"],
     hdrs = ["mplib.h"],
