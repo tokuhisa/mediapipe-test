@@ -2,8 +2,7 @@ package(default_visibility = ["//mediapipe/examples:__subpackages__"])
 
 cc_binary(
     name = "mplib",
-    srcs = ["mplib.cc"],
-    hdrs = ["mplib.h"],
+    srcs = ["mplib.cc", "mplib.h"],
     visibility = ["//visibility:public"],
     copts = ["/MD", "/LD"],
     linkopts = ["/DLL"],
